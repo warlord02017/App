@@ -1,0 +1,11 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "backend server for app",
+  "scripts": {
+    "test": "jest --coverage",
+    "start": "nodemon server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
