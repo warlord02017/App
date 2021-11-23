@@ -4,8 +4,18 @@
   "description": "backend server for app",
   "scripts": {
     "test": "jest --coverage",
-    "start": "nodemon server.js"
+    "start": "node server.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
+    "supertest": "^6.1.6"
+  },
+  "devDependencies": {
+    "jest": "^27.1.0"
+  }
 }

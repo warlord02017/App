@@ -1,0 +1,68 @@
+{
+    "head2headPlayer": {
+        "data": [{
+            "Outcome": "Generic out",
+            "Occurrences": 2
+        },
+        {
+            "Outcome": "Home run",
+            "Occurrences": 1
+        },
+        {
+            "Outcome": "Walk",
+            "Occurrences": 1
+        },
+        {
+            "Outcome": "Double",
+            "Occurrences": 1
+        },
+        {
+            "Outcome": "Triple",
+            "Occurrences": 1
+        },
+        {
+            "Outcome": "Single",
+            "Occurrences": 2
+        },
+        {
+            "Outcome": "Hit by pitch",
+            "Occurrences": 1
+        }]
+    },
+    "teamWins": {
+        "data": 
+        [
+            {"AwayWins": 170, "HomeWins": 198, "TeamName": "Chicago Cubs"}, 
+            {"AwayWins": 183, "HomeWins": 209, "TeamName": "Philadelphia Phillies"}, 
+            {"AwayWins": 196, "HomeWins": 235, "TeamName": "Pittsburgh Pirates"}, 
+            {"AwayWins": 187, "HomeWins": 219, "TeamName": "Cincinnati Reds"}, 
+            {"AwayWins": 210, "HomeWins": 255, "TeamName": "St. Louis Cardinals"}, 
+            {"AwayWins": 205, "HomeWins": 238, "TeamName": "Washington Nationals"}, 
+            {"AwayWins": 196, "HomeWins": 209, "TeamName": "Boston Red Sox"}, 
+            {"AwayWins": 178, "HomeWins": 198, "TeamName": "Chicago White Sox"}, 
+            {"AwayWins": 187, "HomeWins": 219, "TeamName": "Cleveland Indians"}, 
+            {"AwayWins": 206, "HomeWins": 234, "TeamName": "Detroit Tigers"}, 
+            {"AwayWins": 211, "HomeWins": 237, "TeamName": "New York Yankees"}, 
+            {"AwayWins": 193, "HomeWins": 231, "TeamName": "Baltimore Orioles"}, 
+            {"AwayWins": 212, "HomeWins": 234, "TeamName": "Los Angeles Dodgers"}, 
+            {"AwayWins": 201, "HomeWins": 227, "TeamName": "San Francisco Giants"}, 
+            {"AwayWins": 205, "HomeWins": 231, "TeamName": "Los Angeles Angels of Anaheim"}, 
+            {"AwayWins": 171, "HomeWins": 177, "TeamName": "Minnesota Twins"}, 
+            {"AwayWins": 137, "HomeWins": 181, "TeamName": "Houston Astros"}, 
+            {"AwayWins": 202, "HomeWins": 192, "TeamName": "New York Mets"}, 
+            {"AwayWins": 190, "HomeWins": 235, "TeamName": "Atlanta Braves"}, 
+            {"AwayWins": 193, "HomeWins": 227, "TeamName": "Oakland Athletics"}, 
+            {"AwayWins": 199, "HomeWins": 214, "TeamName": "Kansas City Royals"}, 
+            {"AwayWins": 165, "HomeWins": 209, "TeamName": "San Diego Padres"}, 
+            {"AwayWins": 184, "HomeWins": 219, "TeamName": "Milwaukee Brewers"}, 
+            {"AwayWins": 211, "HomeWins": 224, "TeamName": "Texas Rangers"}, 
+            {"AwayWins": 186, "HomeWins": 190, "TeamName": "Seattle Mariners"}, 
+            {"AwayWins": 182, "HomeWins": 222, "TeamName": "Toronto Blue Jays"}, 
+            {"AwayWins": 146, "HomeWins": 199, "TeamName": "Colorado Rockies"}, 
+            {"AwayWins": 40, "HomeWins": 32, "TeamName": "Florida Marlins"}, 
+            {"AwayWins": 190, "HomeWins": 209, "TeamName": "Arizona Diamondbacks"}, 
+            {"AwayWins": 209, "HomeWins": 221, "TeamName": "Tampa Bay Rays"}, 
+            {"AwayWins": 122, "HomeWins": 157, "TeamName": "Miami Marlins"}
+        ]
+    }
+}
