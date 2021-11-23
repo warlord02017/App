@@ -29,18 +29,18 @@ app.get('/', (req, res) => {
     res.json({ message: 'Welcome to our Baseball API' });
 });
 
-app.get('/player', async (req, res) => {
+app.get('/player/:id', async (req, res) => {
     try {
-      if (req.query.id === undefined) {
+      if (req.params.id === undefined) {
         res.status(404).json({ error: 'id is missing' });
         return;
       }
-      const result = await lib.getPlayer(db, req.query.id);
+      const result = await lib.getPlayer(db, req.params.id);
       if (result === undefined) {
         res.status(404).json({ error: 'bad user id' });
         return;
       }
-      res.status(200).json({ data: result });
+      res.status(200).json({ result });
     } catch (err) {
       res.status(404).json({ error: err.message });
     }
@@ -57,7 +57,7 @@ app.get('/head2head/players', async (req, res) => {
             res.status(404).json({ error: 'bad ids' });
             return;
         }
-        res.status(200).json({ data: result });
+        res.status(200).json({ result });
     } catch (err) {
         res.status(404).json({ error: err.message });
     }
@@ -66,11 +66,79 @@ app.get('/head2head/players', async (req, res) => {
 app.get('/teams/wins', async (req, res) => {
     try {
         const result = await lib.teamWins(db);
-        res.status(200).json({ data: result });
+        res.status(200).json({ result });
     } catch (err) {
         res.status(404).json({ error: err.message });
     }
 });
+
+app.get('/head2head/teams/games/:teamOne/:teamTwo', async (req, res) => {
+    try {
+        if (req.params.teamOne === undefined) {
+            res.status(404).json({ error: 'team 1 is missing' });
+            return;
+        }
+        if (req.params.teamTwo === undefined) {
+            res.status(404).json({ error: 'team2 is missing' });
+            return;
+        }
+        const result = await lib.getGameDates(db, req.params.teamOne, req.params.teamTwo);
+        res.status(200).json({result});
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+})
+
+app.get('/head2head/teams/:teamOne/:teamTwo', async (req, res) => {
+    try {
+        if (req.params.teamOne === undefined) {
+            res.status(404).json({ error: 'team 1 is missing' });
+            return;
+        }
+        if (req.params.teamTwo === undefined) {
+            res.status(404).json({ error: 'team2 is missing' });
+            return;
+        }
+        const result = await lib.getSnapShotTeams(db, req.params.teamOne, req.params.teamTwo, req.query.field);
+        res.status(200).json({result});
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+})
+
+app.get('/head2head/teams/pitchers/:teamOne/:teamTwo', async (req, res) => {
+    try {
+        if (req.params.teamOne === undefined) {
+            res.status(404).json({ error: 'team 1 is missing' });
+            return;
+        }
+        if (req.params.teamTwo === undefined) {
+            res.status(404).json({ error: 'team2 is missing' });
+            return;
+        }
+        const result = await lib.getPitchingLeadersTeams(db, req.params.teamOne, req.params.teamTwo, req.query.field);
+        res.status(200).json({result});
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+})
+
+app.get('/head2head/teams/batters/:teamOne/:teamTwo', async (req, res) => {
+    try {
+        if (req.params.teamOne === undefined) {
+            res.status(404).json({ error: 'team 1 is missing' });
+            return;
+        }
+        if (req.params.teamTwo === undefined) {
+            res.status(404).json({ error: 'team2 is missing' });
+            return;
+        }
+        const result = await lib.getBattingLeadersTeams(db, req.params.teamOne, req.params.teamTwo, req.query.at_bats);
+        res.status(200).json({result});
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+})
 
 module.exports = app;
 
