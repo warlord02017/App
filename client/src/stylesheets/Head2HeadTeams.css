@@ -1,0 +1,39 @@
+.selection {
+    width: 100%;
+    background-color: #E25;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.selectors {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%
+}
+
+.h2h-go {
+    margin-left: 15px;
+    white-space: nowrap;
+    background: #2D3138;
+    color: white;
+    display: inline-block;
+    text-decoration: none;
+    line-height: 60px;
+    border-radius: 30px;
+    font-size: 24px;
+    font-weight: 900;
+    padding: 0 25px 0 30px;
+}
+
+.h2h-go:hover {
+    color:#E25;
+}
+
+.versus {
+    padding-left: 1%;
+    padding-right: 1%;
+    font-weight: bolder;
+}
