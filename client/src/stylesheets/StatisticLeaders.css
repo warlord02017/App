@@ -1,0 +1,25 @@
+.leaders-outer {
+    display: flex;
+    flex-direction: row;
+
+}
+
+.hr-leaders {
+    width: 40%;
+    padding-right: 15%;
+}
+
+.hitting-leaders {
+    width: 40%;
+    padding-right: 15%;
+}
+
+.hr-eye {
+    width: 40%;
+
+}
+
+h5 {
+    text-decoration: underline;
+    text-decoration-color: #2D3138;
+}
