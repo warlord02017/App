@@ -401,7 +401,7 @@ const getLeaderboardBySeason = async (db, year) => {
       FROM Teams
       JOIN Game
       ON Game.AwayTeam = Teams.TeamID
-      WHERE Game.HomeScore < Game.AwayScore AND Game.Date BETWEEN '2013-05-01' AND '2014-05-01'
+      WHERE Game.HomeScore < Game.AwayScore AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
       GROUP BY Teams.Name)
   SELECT Home.Name AS TeamName, Home.wins AS HomeWins, Away.wins AS AwayWins, Home.wins + Away.wins AS TotalWins
   FROM Home
