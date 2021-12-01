@@ -122,7 +122,7 @@ app.get('/head2head/teams/pitchers/:teamOne/:teamTwo', async (req, res) => {
         res.status(404).json({ error: err.message });
     }
 })
-
+/*
 app.get('/head2head/teams/batters/:teamOne/:teamTwo', async (req, res) => {
     try {
         if (req.params.teamOne === undefined) {
@@ -139,6 +139,22 @@ app.get('/head2head/teams/batters/:teamOne/:teamTwo', async (req, res) => {
         res.status(404).json({ error: err.message });
     }
 })
+*/
+
+app.get('/teams/:teamId', async (req, res) => {
+    try {
+        if (req.params.teamId === undefined) {
+            res.status(404).json({ error: 'Team Id is missing' });
+            return;
+        }
+
+        const result = await lib.getTeamByIdAndYear(db, req.params.teamId, req.query.year);
+        res.status(200).json({result});
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+})
+
 
 module.exports = app;
 

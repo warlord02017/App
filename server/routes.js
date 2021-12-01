@@ -357,135 +357,23 @@ const getPitchingLeadersTeams = async (db, team1, team2, batters_faced, avg) => 
 }
 
 
-const getBattingLeadersTeams = async (db, team1, team2, at_bats) => {
+/* Pls reach out to me for any issues with this endpoint; Author: Sashank */
+const getTeamByIdAndYear = async (db, teamId, year) => {
   try {
-    team1 = team1.split('-').join(' ');
-    team2 = team2.split('-').join(' ');
-    const bats_count = (at_bats) ? at_bats : 0;
-    const query = `WITH teams AS (
-                  SELECT DISTINCT Name, TeamID
-                  FROM TeamName
-                  WHERE Name = '${team2}' or Name = '${team1}'
-                  AND TeamName.Year >= 2011
-              ),
-              games_t1 AS (
-                  SELECT year(Game.Date) as year, Event.Pitcher AS pitcher, TeamMember.TeamID AS team, Event.Batter AS batter, Event.EventType as event
-                  FROM Event
-                  JOIN Game
-                  ON Event.GameID = Game.ID
-                  JOIN TeamMember
-                  ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Batter
-                  WHERE Game.Date >= 2011
-                  AND TeamMember.TeamID  IN (
-                                              SELECT DISTINCT TeamID
-                                              FROM TeamName
-                                              WHERE Year >= 2011 AND
-                                              Name = '${team1}'
-                                            )
-              ),
-              games_t1_stats AS (
-                  SELECT games_t1.batter, games_t1.team, games_t1.event
-                  FROM games_t1
-                  JOIN TeamMember
-                  ON games_t1.year = TeamMember.Year AND TeamMember.PlayerID = games_t1.pitcher
-                  WHERE TeamMember.TeamID IN (
-                                              SELECT DISTINCT TeamID
-                                              FROM TeamName
-                                              WHERE Year >= 2011 AND
-                                              Name = '${team2}'
-                                              )
-              ),
-              games_t2 AS (
-                  SELECT year(Game.Date) as year, Event.Pitcher AS pitcher, TeamMember.TeamID AS team, Event.Batter AS batter, Event.EventType as event
-                  FROM Event
-                  JOIN Game
-                  ON Event.GameID = Game.ID
-                  JOIN TeamMember
-                  ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Batter
-                  WHERE Game.Date >= 2011
-                  AND TeamMember.TeamID  IN (
-                                              SELECT DISTINCT TeamID
-                                              FROM TeamName
-                                              WHERE Year >= 2011 AND
-                                              Name = '${team2}'
-                                          )
-              ),
-              games_t2_stats AS (
-                  SELECT games_t2.batter, games_t2.team, games_t2.event
-                  FROM games_t2
-                  JOIN TeamMember
-                  ON games_t2.year = TeamMember.Year AND TeamMember.PlayerID = games_t2.pitcher
-                  WHERE TeamMember.TeamID IN (
-                                              SELECT DISTINCT TeamID
-                                              FROM TeamName
-                                              WHERE Year >= 2011 AND
-                                              Name = '${team1}'
-                                              )
-              ),
-              all_stats AS (
-                  SELECT *
-                  FROM games_t1_stats
-                  UNION ALL
-                  SELECT *
-                  FROM games_t2_stats
-              ),
-              homeruns AS (
-                  SELECT all_stats.batter, all_stats.team, COUNT(*) as homeruns
-                  FROM all_stats
-                  WHERE all_stats.event = 'Home run'
-                  GROUP BY all_stats.batter, all_stats.team
-              ),
-              singles AS (
-                  SELECT all_stats.batter, all_stats.team, COUNT(*) as singles
-                  FROM all_stats
-                  WHERE all_stats.event = 'Single'
-                  GROUP BY all_stats.batter, all_stats.team
-              ),
-              doubles AS (
-                  SELECT all_stats.batter, all_stats.team, COUNT(*) as doubles
-                  FROM all_stats
-                  WHERE all_stats.event = 'Double'
-                  GROUP BY all_stats.batter, all_stats.team
-              ),
-              triples AS (
-                  SELECT all_stats.batter, all_stats.team, COUNT(*) as triples
-                  FROM all_stats
-                  WHERE all_stats.event = 'Triple'
-                  GROUP BY all_stats.batter, all_stats.team
-              ),
-              appearances AS (
-                  SELECT all_stats.batter, all_stats.team, COUNT(*) as at_bats
-                  FROM all_stats
-                  GROUP BY all_stats.batter, all_stats.team
-              )
-              SELECT Player.firstname, Player.lastname, teams.Name, appearances.at_bats,
-                    IFNULL(homeruns.homeruns, 0) AS homeruns, IFNULL(singles.singles, 0) AS singles,
-                    IFNULL(doubles.doubles, 0) AS doubles, IFNULL(triples.triples, 0) AS triples,
-                    (IFNULL(homeruns.homeruns, 0) + IFNULL(singles.singles, 0) + IFNULL(doubles.doubles, 0)
-                        + IFNULL(triples.triples, 0)) / at_bats AS batting_avg
-              FROM appearances
-              LEFT JOIN homeruns
-              ON appearances.batter = homeruns.batter AND appearances.team = homeruns.team
-              LEFT JOIN singles
-              ON appearances.batter = singles.batter AND appearances.team = singles.team
-              LEFT JOIN doubles
-              ON appearances.batter = doubles.batter AND appearances.team = doubles.team
-              LEFT JOIN triples
-              ON appearances.batter = triples.batter AND appearances.team = triples.team
-              JOIN Player
-              ON Player.ID = appearances.batter
-              JOIN teams
-              ON teams.TeamID = appearances.team
-              WHERE appearances.at_bats >= ${bats_count};`
+    const Year = (year) ? year : 2014;
+    const query = `SELECT FirstName, LastName, BirthCountry, DebutDate
+    FROM Player
+             JOIN TeamMember ON Player.ID = TeamMember.PlayerID
+    WHERE TeamID = ${teamId}
+      AND Year = ${Year};`
 
     const row = await db.execute(query);
     return row[0];
   } catch (err) {
     console.log(err);
     throw new Error('Error executing the query');
-  }
-}
+  }}
 
 module.exports = {
-  connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams, getBattingLeadersTeams
+  connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams/*, getBattingLeadersTeams*/, getTeamByIdAndYear
 };
