@@ -141,6 +141,7 @@ app.get('/head2head/teams/batters/:teamOne/:teamTwo', async (req, res) => {
 })
 */
 
+/*this endpoint takes an optional query param "year" */
 app.get('/teams/:teamId', async (req, res) => {
     try {
         if (req.params.teamId === undefined) {
@@ -154,6 +155,19 @@ app.get('/teams/:teamId', async (req, res) => {
         res.status(404).json({ error: err.message });
     }
 })
+
+/*this endpoint takes an optional query param "year" */
+app.get('/teams/leaderboard', async (req, res) => {
+    try {
+
+        const result = await lib.getLeaderboardBySeason(db, req.query.year);
+        res.status(200).json({result});
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+})
+
+
 
 
 module.exports = app;

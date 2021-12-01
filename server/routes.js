@@ -374,6 +374,48 @@ const getTeamByIdAndYear = async (db, teamId, year) => {
     throw new Error('Error executing the query');
   }}
 
+
+/* Pls reach out to me for any issues with this endpoint; Author: Sashank */
+/* year can only be one of {2011,2012,2013,2014,2015} because 1M rows are contained in these many years
+and we restricted the events table to 1M after discussing with our mentor*/
+const getLeaderboardBySeason = async (db, year) => {
+  try {
+    const Year = (year) ? parseInt(year) : 2014;
+    var YearString = Year.toString();
+    const startDate = YearString.concat("-03-01");
+    const YearPlusOne = Year + 1;
+    var YearPlusOneString = YearPlusOne.toString();
+    const endDate = YearPlusOneString.concat("-02-20");
+    console.log(Year);
+    console.log(YearPlusOne);
+    const query = `WITH Teams AS (
+      SELECT DISTINCT(NAME),TeamID FROM TeamName  WHERE YEAR>=2011 AND YEAR<=2015 ORDER BY TeamID
+      ),
+      Home AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS wins
+      FROM Teams
+      JOIN Game
+      ON Game.HomeTeam = Teams.TeamID
+      WHERE Game.HomeScore > Game.AwayScore AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
+      GROUP BY Teams.Name),
+      Away AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS wins
+      FROM Teams
+      JOIN Game
+      ON Game.AwayTeam = Teams.TeamID
+      WHERE Game.HomeScore < Game.AwayScore AND Game.Date BETWEEN '2013-05-01' AND '2014-05-01'
+      GROUP BY Teams.Name)
+  SELECT Home.Name AS TeamName, Home.wins AS HomeWins, Away.wins AS AwayWins, Home.wins + Away.wins AS TotalWins
+  FROM Home
+           JOIN Away ON Home.Name = Away.Name
+  ORDER BY TotalWins DESC
+  LIMIT 10;`
+
+    const row = await db.execute(query);
+    return row[0];
+  } catch (err) {
+    console.log(err);
+    throw new Error('Error executing the query' + err);
+  }}
+
 module.exports = {
-  connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams/*, getBattingLeadersTeams*/, getTeamByIdAndYear
+  connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams/*, getBattingLeadersTeams*/, getTeamByIdAndYear, getLeaderboardBySeason
 };
