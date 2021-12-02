@@ -1,5 +1,6 @@
 import config from './config.json'
 
+/*
 const getAllMatches = async (page, pagesize, league) => {
     var res = await fetch(`http://${config.server_host}:${config.server_port}/matches/${league}?page=${page}&pagesize=${pagesize}`, {
         method: 'GET',
@@ -41,6 +42,16 @@ const getPlayerSearch = async (name, nationality, club, rating_high, rating_low,
     })
     return res.json()
 }
+*/
+
+const getLeaderboard = async (year) => {
+    var res = await fetch(`http://${config.server_host}:${config.server_port}/teams/season/leaderboard?year=${year}`, {
+        method: 'GET',
+    })
+    return res.json()
+}
+
+
 
 
 
@@ -55,10 +66,11 @@ const getPlayerSearch = async (name, nationality, club, rating_high, rating_low,
 
 
 export {
-    getAllMatches,
-    getAllPlayers,
-    getMatch,
-    getPlayer,
-    getMatchSearch,
-    getPlayerSearch
-}
+//     getAllMatches,
+//     getAllPlayers,
+//     getMatch,
+//     getPlayer,
+//     getMatchSearch,
+//     getPlayerSearch
+getLeaderboard
+ }
