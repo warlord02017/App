@@ -378,18 +378,20 @@ const getTeamByIdAndYear = async (db, teamId, year) => {
 /* Pls reach out to me for any issues with this endpoint; Author: Sashank */
 /* year can only be one of {2011,2012,2013,2014,2015} because 1M rows are contained in these many years
 and we restricted the events table to 1M after discussing with our mentor*/
-const getLeaderboardBySeason = async (db, year) => {
+const getLeaderboardBySeason = async (db, year, pagesize) => {
   try {
     const Year = (year) ? parseInt(year) : 2014;
     var YearString = Year.toString();
     const startDate = YearString.concat("-03-01");
+    const pageSize = (pagesize) ? pagesize : 10;
     const YearPlusOne = Year + 1;
     var YearPlusOneString = YearPlusOne.toString();
     const endDate = YearPlusOneString.concat("-02-20");
     console.log(Year);
     console.log(YearPlusOne);
+/*  
     const query = `WITH Teams AS (
-      SELECT DISTINCT(NAME),TeamID FROM TeamName  WHERE YEAR>=2011 AND YEAR<=2015 ORDER BY TeamID
+      SELECT DISTINCT(NAME),TeamID FROM TeamName  WHERE YEAR>=2010 AND YEAR<=2016 ORDER BY TeamID
       ),
       Home AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS wins
       FROM Teams
@@ -407,7 +409,53 @@ const getLeaderboardBySeason = async (db, year) => {
   FROM Home
            JOIN Away ON Home.Name = Away.Name
   ORDER BY TotalWins DESC
-  LIMIT 10;`
+  LIMIT ${pageSize};`
+*/
+
+const query = `WITH Teams AS (
+  SELECT DISTINCT(NAME), TeamID FROM TeamName WHERE YEAR >= 2010 AND YEAR <= 2016 ORDER BY TeamID
+),
+   Home AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS wins
+            FROM Teams
+                     JOIN Game
+                          ON Game.HomeTeam = Teams.TeamID
+            WHERE Game.HomeScore > Game.AwayScore
+              AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
+            GROUP BY Teams.Name),
+   Away AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS wins
+            FROM Teams
+                     JOIN Game
+                          ON Game.AwayTeam = Teams.TeamID
+            WHERE Game.HomeScore < Game.AwayScore
+              AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
+            GROUP BY Teams.Name),
+   HomeTotalGames AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS HomeGames
+                      FROM Teams
+                               JOIN Game
+                                    ON Game.HomeTeam = Teams.TeamID
+                      WHERE Game.Date BETWEEN '${startDate}' AND '${endDate}'
+                      GROUP BY Teams.Name),
+   AwayTotalGames AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS AwayGames
+                      FROM Teams
+                               JOIN Game
+                                    ON Game.AwayTeam = Teams.TeamID
+                      WHERE Game.Date BETWEEN '${startDate}' AND '${endDate}'
+                      GROUP BY Teams.Name),
+   TotalGamesByTeam AS (
+       SELECT HomeTotalGames.Name AS TeamName, HomeTotalGames.HomeGames + AwayTotalGames.AwayGames AS TotalGames
+       FROM HomeTotalGames
+                JOIN AwayTotalGames ON HomeTotalGames.Name = AwayTotalGames.Name),
+   embryoLeaderboard AS (
+       SELECT Home.Name AS TeamName, Home.wins AS HomeWins, Away.wins AS AwayWins, Home.wins + Away.wins AS TotalWins
+       FROM Home
+                JOIN Away ON Home.Name = Away.Name
+   )
+SELECT embryoLeaderboard.TeamName, HomeWins, AwayWins, TotalWins, TotalGames - TotalWins AS TotalLosses, TotalGames
+FROM embryoLeaderboard
+       JOIN TotalGamesByTeam
+            ON embryoLeaderboard.TeamName = TotalGamesByTeam.TeamName
+ORDER BY TotalWins DESC
+LIMIT ${pageSize};`
 
     const row = await db.execute(query);
     return row[0];

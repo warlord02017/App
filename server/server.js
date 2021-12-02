@@ -157,10 +157,10 @@ app.get('/teams/:teamId', async (req, res) => {
 })
 
 /*this endpoint takes an optional query param "year" */
-app.get('/teams/leaderboard', async (req, res) => {
+app.get('/teams/season/leaderboard', async (req, res) => {
     try {
 
-        const result = await lib.getLeaderboardBySeason(db, req.query.year);
+        const result = await lib.getLeaderboardBySeason(db, req.query.year, req.query.pagesize);
         res.status(200).json({result});
     } catch (err) {
         res.status(404).json({ error: err.message });
