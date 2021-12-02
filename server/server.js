@@ -167,9 +167,9 @@ app.get('/teams/leaderboard', async (req, res) => {
     }
 })
 
-// this endpoint is used to fetch player-specific statistics
+// this endpoint is used to fetch player-specific pitching statistics (author: mahesh)
 
-app.get('/player/stats/:id', async(req, res) => {
+app.get('/player/pitchstats/:id', async(req, res) => {
     try {
 
         if (req.params.id === undefined) {
@@ -177,7 +177,27 @@ app.get('/player/stats/:id', async(req, res) => {
             return;
         }
 
-        const result = await lib.getPlayerStats(db, req.params.id, req.query.dateStart, req.query.dateEnd,
+        const result = await lib.getPlayerPitchingStats(db, req.params.id, req.query.dateStart, req.query.dateEnd,
+            req.query.againstTeams, req.query.forTeams)
+        res.status(200).json({result})
+
+    } catch (err) {
+        res.status(404).json({error: err.message});
+    }
+
+})
+
+// this endpoint is used to fetch player-specific batting statistics (author: mahesh)
+
+app.get('/player/batstats/:id', async(req, res) => {
+    try {
+
+        if (req.params.id === undefined) {
+            res.status(404).json({ error: 'Player ID is not passed or invalid' });
+            return;
+        }
+
+        const result = await lib.getPlayerBattingStats(db, req.params.id, req.query.dateStart, req.query.dateEnd,
             req.query.againstTeams, req.query.forTeams)
         res.status(200).json({result})
 

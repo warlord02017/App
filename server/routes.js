@@ -416,6 +416,350 @@ const getLeaderboardBySeason = async (db, year) => {
     throw new Error('Error executing the query' + err);
   }}
 
+const getPlayerPitchingStats = async(db, playerID, dateStart, dateEnd, againstTeams, forTeams) => {
+  try {
+    
+    const id = playerID;
+    const date_start = dateStart ? dateStart: "2011-01-01";
+    const date_end = dateEnd ? dateEnd : "2015-12-31";
+    const against_teams = againstTeams ? againstTeams : null;
+    
+    const for_teams = forTeams ? forTeams : null;
+
+    var row; 
+    var rows;
+    
+    if (for_teams === null && against_teams === null) {
+
+      const query1 = `
+        SELECT COUNT(*) as totalNumEvents
+        FROM Event
+        WHERE Pitcher = '${id}'
+        AND GameID IN (SELECT ID FROM Game WHERE Date >= '${date_start}' AND Date <= '${date_end}');`
+
+      row = await db.execute(query1);
+
+      const query2 = `
+        SELECT EventType, COUNT(*) AS eventCount
+        FROM Event
+        WHERE Pitcher = '${id}'
+          AND EventType IN ("Home run", "Walk", "Single", "Double", "Triple", "Strikeout")
+          AND GameID IN (SELECT ID FROM Game WHERE Date >= '${date_start}' AND Date <= '${date_end}')
+        GROUP BY EventType
+        ORDER BY CONCAT(EventType);`
+
+      rows = await db.execute(query2);
+
+    }
+
+    if (for_teams !== null && against_teams === null) {
+
+      const query1 = `
+        SELECT COUNT(*) AS totalNumEvents
+        FROM Event JOIN TeamMember JOIN Game
+        ON (Event.Pitcher = TeamMember.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMember.Year)
+        WHERE 
+          Event.Pitcher = '${id}' AND 
+          Game.Date >= '${date_start}' AND 
+          Game.Date <= '${date_end}' AND 
+          TeamMember.TeamID IN ${for_teams};`
+
+      row = await db.execute(query1);
+
+      const query2 = `
+        SELECT EventType, COUNT(*) AS eventCount
+        FROM Event
+                 JOIN TeamMember
+                 JOIN Game
+                      ON (Event.Pitcher = TeamMember.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMember.Year)
+        WHERE Event.Pitcher = '${id}' AND 
+          Game.Date >= '${date_start}' AND 
+          Game.Date <= '${date_end}' AND 
+          TeamMember.TeamID IN ${for_teams}
+          AND Event.EventType IN ("Home run", "Walk", "Single", "Double", "Triple", "Strikeout")
+        GROUP BY Event.EventType
+        ORDER BY CONCAT(Event.EventType);`
+
+      rows = await db.execute(query2);
+
+    }
+
+    if (for_teams === null && against_teams !== null) {
+
+      const query1 = `
+        SELECT COUNT(*) AS totalNumEvents
+        FROM Event JOIN TeamMember JOIN Game
+        ON (Event.Batter = TeamMember.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMember.Year)
+        WHERE 
+          Event.Pitcher = '${id}' AND 
+          Game.Date >= '${date_start}' AND 
+          Game.Date <= '${date_end}' AND 
+          TeamMember.TeamID IN ${against_teams};`
+
+      row = await db.execute(query1);
+
+      const query2 = `
+        SELECT EventType, COUNT(*) AS eventCount
+        FROM Event
+                 JOIN TeamMember
+                 JOIN Game
+                      ON (Event.Batter = TeamMember.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMember.Year)
+        WHERE Event.Pitcher = '${id}' AND 
+          Game.Date >= '${date_start}' AND 
+          Game.Date <= '${date_end}' AND 
+          TeamMember.TeamID IN ${against_teams}
+          AND Event.EventType IN ("Home run", "Walk", "Single", "Double", "Triple", "Strikeout")
+        GROUP BY Event.EventType
+        ORDER BY CONCAT(Event.EventType);`
+
+      rows = await db.execute(query2);
+
+    }
+
+    if (for_teams !== null && against_teams !== null) {
+
+      const query1 = `
+        SELECT COUNT(*) AS totalNumEvents
+        FROM Event JOIN TeamMember TeamMemberBatter JOIN TeamMember TeamMemberPitcher JOIN Game
+        ON (Event.Batter = TeamMemberBatter.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMemberBatter.Year
+        AND Event.Pitcher = TeamMemberPitcher.PlayerID AND YEAR(Game.Date) = TeamMemberPitcher.Year)
+        WHERE 
+          Event.Pitcher = '${id}' AND 
+          Game.Date >= '${date_start}' AND 
+          Game.Date <= '${date_end}' AND 
+          TeamMemberBatter.TeamID IN ${against_teams} AND
+          TeamMemberPitcher.TeamID IN ${for_teams};`
+
+      row = await db.execute(query1);
+
+      const query2 = `
+        SELECT EventType, COUNT(*) AS eventCount
+        FROM Event JOIN TeamMember TeamMemberBatter JOIN TeamMember TeamMemberPitcher JOIN Game
+        ON (Event.Batter = TeamMemberBatter.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMemberBatter.Year
+        AND Event.Pitcher = TeamMemberPitcher.PlayerID AND YEAR(Game.Date) = TeamMemberPitcher.Year)
+        WHERE Event.Pitcher = '${id}' AND 
+          Game.Date >= '${date_start}' AND 
+          Game.Date <= '${date_end}' AND 
+          TeamMemberBatter.TeamID IN ${against_teams} AND
+          TeamMemberPitcher.TeamID IN ${for_teams} AND 
+          Event.EventType IN ("Home run", "Walk", "Single", "Double", "Triple", "Strikeout")
+        GROUP BY Event.EventType
+        ORDER BY CONCAT(Event.EventType);`
+
+      rows = await db.execute(query2);
+
+    }
+
+    res = {
+      HomerunsAllowed: 0,
+      WalksAllowed: 0,
+      SinglesAllowed: 0,
+      DoublesAllowed: 0,
+      TriplesAllowed: 0,
+      Strikeouts: 0
+    }
+
+    for (var i = rows[0].length - 1; i >= 0; i--) {
+      
+      switch (rows[0][i].EventType) {
+        case "Home run": res.HomerunsAllowed = rows[0][i].eventCount; break;
+        case "Walk": res.WalksAllowed = rows[0][i].eventCount; break;
+        case "Single": res.SinglesAllowed = rows[0][i].eventCount; break;
+        case "Double": res.DoublesAllowed = rows[0][i].eventCount; break;
+        case "Triple": res.TriplesAllowed = rows[0][i].eventCount; break;
+        case "Strikeout": res.Strikeouts = rows[0][i].eventCount; break;
+      }
+
+    }
+
+    if (row[0][0].totalNumEvents > 0) {
+      res.StrikeoutRate = res.Strikeouts / row[0][0].totalNumEvents 
+    } else {
+      res.StrikeoutRate = null
+    }
+
+    return res;
+
+  }
+
+  catch (err) {
+    console.log(err);
+    throw new Error('Error executing the query');
+  }
+
+}
+
+const getPlayerBattingStats = async(db, playerID, dateStart, dateEnd, againstTeams, forTeams) => {
+  try {
+    
+    const id = playerID;
+    const date_start = dateStart ? dateStart: "2011-01-01";
+    const date_end = dateEnd ? dateEnd : "2015-12-31";
+    const against_teams = againstTeams ? againstTeams : null;
+    
+    const for_teams = forTeams ? forTeams : null;
+
+    var row; 
+    var rows;
+    
+    if (for_teams === null && against_teams === null) {
+
+      const query1 = `
+        SELECT COUNT(*) as totalNumEvents
+        FROM Event
+        WHERE Batter = '${id}'
+        AND GameID IN (SELECT ID FROM Game WHERE Date >= '${date_start}' AND Date <= '${date_end}');`
+
+      row = await db.execute(query1);
+
+      const query2 = `
+        SELECT EventType, COUNT(*) AS eventCount
+        FROM Event
+        WHERE Batter = '${id}'
+          AND EventType IN ("Home run", "Walk", "Single", "Double", "Triple")
+          AND GameID IN (SELECT ID FROM Game WHERE Date >= '${date_start}' AND Date <= '${date_end}')
+        GROUP BY EventType
+        ORDER BY CONCAT(EventType);`
+
+      rows = await db.execute(query2);
+
+    }
+
+    if (for_teams !== null && against_teams === null) {
+
+      const query1 = `
+        SELECT COUNT(*) AS totalNumEvents
+        FROM Event JOIN TeamMember JOIN Game
+        ON (Event.Batter = TeamMember.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMember.Year)
+        WHERE 
+          Event.Batter = '${id}' AND 
+          Game.Date >= '${date_start}' AND 
+          Game.Date <= '${date_end}' AND 
+          TeamMember.TeamID IN ${for_teams};`
+
+      row = await db.execute(query1);
+
+      const query2 = `
+        SELECT EventType, COUNT(*) AS eventCount
+        FROM Event
+                 JOIN TeamMember
+                 JOIN Game
+                      ON (Event.Batter = TeamMember.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMember.Year)
+        WHERE Event.Batter = '${id}' AND 
+          Game.Date >= '${date_start}' AND 
+          Game.Date <= '${date_end}' AND 
+          TeamMember.TeamID IN ${for_teams}
+          AND Event.EventType IN ("Home run", "Walk", "Single", "Double", "Triple")
+        GROUP BY Event.EventType
+        ORDER BY CONCAT(Event.EventType);`
+
+      rows = await db.execute(query2);
+
+    }
+
+    if (for_teams === null && against_teams !== null) {
+
+      const query1 = `
+        SELECT COUNT(*) AS totalNumEvents
+        FROM Event JOIN TeamMember JOIN Game
+        ON (Event.Pitcher = TeamMember.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMember.Year)
+        WHERE 
+          Event.Batter = '${id}' AND 
+          Game.Date >= '${date_start}' AND 
+          Game.Date <= '${date_end}' AND 
+          TeamMember.TeamID IN ${against_teams};`
+
+      row = await db.execute(query1);
+
+      const query2 = `
+        SELECT EventType, COUNT(*) AS eventCount
+        FROM Event
+                 JOIN TeamMember
+                 JOIN Game
+                      ON (Event.Pitcher = TeamMember.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMember.Year)
+        WHERE Event.Batter = '${id}' AND 
+          Game.Date >= '${date_start}' AND 
+          Game.Date <= '${date_end}' AND 
+          TeamMember.TeamID IN ${against_teams}
+          AND Event.EventType IN ("Home run", "Walk", "Single", "Double", "Triple")
+        GROUP BY Event.EventType
+        ORDER BY CONCAT(Event.EventType);`
+
+      rows = await db.execute(query2);
+
+    }
+
+    if (for_teams !== null && against_teams !== null) {
+
+      const query1 = `
+        SELECT COUNT(*) AS totalNumEvents
+        FROM Event JOIN TeamMember TeamMemberBatter JOIN TeamMember TeamMemberPitcher JOIN Game
+        ON (Event.Batter = TeamMemberBatter.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMemberBatter.Year
+        AND Event.Pitcher = TeamMemberPitcher.PlayerID AND YEAR(Game.Date) = TeamMemberPitcher.Year)
+        WHERE 
+          Event.Batter = '${id}' AND 
+          Game.Date >= '${date_start}' AND 
+          Game.Date <= '${date_end}' AND 
+          TeamMemberPitcher.TeamID IN ${against_teams} AND
+          TeamMemberBatter.TeamID IN ${for_teams};`
+
+      row = await db.execute(query1);
+
+      const query2 = `
+        SELECT EventType, COUNT(*) AS eventCount
+        FROM Event JOIN TeamMember TeamMemberBatter JOIN TeamMember TeamMemberPitcher JOIN Game
+        ON (Event.Batter = TeamMemberBatter.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMemberBatter.Year
+        AND Event.Pitcher = TeamMemberPitcher.PlayerID AND YEAR(Game.Date) = TeamMemberPitcher.Year)
+        WHERE Event.Batter = '${id}' AND 
+          Game.Date >= '${date_start}' AND 
+          Game.Date <= '${date_end}' AND 
+          TeamMemberPitcher.TeamID IN ${against_teams} AND
+          TeamMemberBatter.TeamID IN ${for_teams} AND 
+          Event.EventType IN ("Home run", "Walk", "Single", "Double", "Triple")
+        GROUP BY Event.EventType
+        ORDER BY CONCAT(Event.EventType);`
+
+      rows = await db.execute(query2);
+
+    }
+
+    res = {
+      Homeruns: 0,
+      Walks: 0,
+      Singles: 0,
+      Doubles: 0,
+      Triples: 0
+    }
+
+    for (var i = rows[0].length - 1; i >= 0; i--) {
+      
+      switch (rows[0][i].EventType) {
+        case "Home run": res.Homeruns = rows[0][i].eventCount; break;
+        case "Walk": res.Walks = rows[0][i].eventCount; break;
+        case "Single": res.Singles = rows[0][i].eventCount; break;
+        case "Double": res.Doubles = rows[0][i].eventCount; break;
+        case "Triple": res.Triples = rows[0][i].eventCount; break;
+      }
+
+    }
+
+    if (row[0][0].totalNumEvents > 0) {
+      res.BattingAvg = (res.Homeruns + res.Walks + res.Singles + res.Doubles + res.Triples) / row[0][0].totalNumEvents 
+    } else {
+      res.BattingAvg = null
+    }
+
+    return res;
+
+  }
+
+  catch (err) {
+    console.log(err);
+    throw new Error('Error executing the query');
+  }
+
+}
+
 module.exports = {
-  connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams/*, getBattingLeadersTeams*/, getTeamByIdAndYear, getLeaderboardBySeason
+  connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams/*, getBattingLeadersTeams*/, getTeamByIdAndYear, getLeaderboardBySeason, getPlayerPitchingStats, getPlayerBattingStats
 };
