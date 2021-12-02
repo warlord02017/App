@@ -438,57 +438,6 @@ FROM embryoLeaderboardWins
 ORDER BY TotalWins DESC
 LIMIT ${pageSize};`
 
-
-
-/*
-
-`WITH Teams AS (
-  SELECT DISTINCT(NAME), TeamID FROM TeamName WHERE YEAR >= 2010 AND YEAR <= 2016 ORDER BY TeamID
-),
-   Home AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS wins
-            FROM Teams
-                     JOIN Game
-                          ON Game.HomeTeam = Teams.TeamID
-            WHERE Game.HomeScore > Game.AwayScore
-              AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
-            GROUP BY Teams.Name),
-   Away AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS wins
-            FROM Teams
-                     JOIN Game
-                          ON Game.AwayTeam = Teams.TeamID
-            WHERE Game.HomeScore < Game.AwayScore
-              AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
-            GROUP BY Teams.Name),
-   HomeTotalGames AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS HomeGames
-                      FROM Teams
-                               JOIN Game
-                                    ON Game.HomeTeam = Teams.TeamID
-                      WHERE Game.Date BETWEEN '${startDate}' AND '${endDate}'
-                      GROUP BY Teams.Name),
-   AwayTotalGames AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS AwayGames
-                      FROM Teams
-                               JOIN Game
-                                    ON Game.AwayTeam = Teams.TeamID
-                      WHERE Game.Date BETWEEN '${startDate}' AND '${endDate}'
-                      GROUP BY Teams.Name),
-   TotalGamesByTeam AS (
-       SELECT HomeTotalGames.Name AS TeamName, HomeTotalGames.HomeGames + AwayTotalGames.AwayGames AS TotalGames
-       FROM HomeTotalGames
-                JOIN AwayTotalGames ON HomeTotalGames.Name = AwayTotalGames.Name),
-   embryoLeaderboard AS (
-       SELECT Home.Name AS TeamName, Home.wins AS HomeWins, Away.wins AS AwayWins, Home.wins + Away.wins AS TotalWins
-       FROM Home
-                JOIN Away ON Home.Name = Away.Name
-   )
-SELECT embryoLeaderboard.TeamName, HomeWins, AwayWins, TotalWins, TotalGames - TotalWins AS TotalLosses, TotalGames
-FROM embryoLeaderboard
-       JOIN TotalGamesByTeam
-            ON embryoLeaderboard.TeamName = TotalGamesByTeam.TeamName
-ORDER BY TotalWins DESC
-LIMIT ${pageSize};`
-
-*/
-
     const row = await db.execute(query);
     return row[0];
   } catch (err) {
