@@ -393,33 +393,33 @@ const getLeaderboardBySeason = async (db, year, pagesize) => {
 const query = `WITH Teams AS (
   SELECT DISTINCT(NAME), TeamID FROM TeamName WHERE YEAR >= 2010 AND YEAR <= 2016 ORDER BY TeamID
 ),
-   HomeGameWins AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS wins
+   HomeGameWins AS (SELECT DISTINCT(Teams.TeamID) as TeamId, Teams.Name, COUNT(*) AS wins
             FROM Teams
                      JOIN Game
                           ON Game.HomeTeam = Teams.TeamID
             WHERE Game.HomeScore > Game.AwayScore
               AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
             GROUP BY Teams.Name),
-   AwayGameWins AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS wins
+   AwayGameWins AS (SELECT DISTINCT(Teams.TeamID) as TeamId, Teams.Name, COUNT(*) AS wins
             FROM Teams
                      JOIN Game
                           ON Game.AwayTeam = Teams.TeamID
             WHERE Game.HomeScore < Game.AwayScore
               AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
-            GROUP BY Teams.Name), 
+            GROUP BY Teams.Name), /*here it is*/
    embryoLeaderboardWins AS (
-       SELECT HomeGameWins.Name AS TeamName, HomeGameWins.wins AS HomeWins, AwayGameWins.wins AS AwayWins, HomeGameWins.wins + AwayGameWins.wins AS TotalWins
+       SELECT HomeGameWins.TeamId,HomeGameWins.Name AS TeamName, HomeGameWins.wins AS HomeWins, AwayGameWins.wins AS AwayWins, HomeGameWins.wins + AwayGameWins.wins AS TotalWins
        FROM HomeGameWins
                 JOIN AwayGameWins ON HomeGameWins.Name = AwayGameWins.Name
    ),
-   HomeGameLoss AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS loss
+   HomeGameLoss AS (SELECT DISTINCT(Teams.TeamID) as TeamId, Teams.Name, COUNT(*) AS loss
             FROM Teams
                      JOIN Game
                           ON Game.HomeTeam = Teams.TeamID
             WHERE Game.HomeScore < Game.AwayScore
               AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
             GROUP BY Teams.Name),
-   AwayGameLoss AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS loss
+   AwayGameLoss AS (SELECT DISTINCT(Teams.TeamID) as TeamId, Teams.Name, COUNT(*) AS loss
             FROM Teams
                      JOIN Game
                           ON Game.AwayTeam = Teams.TeamID
@@ -427,16 +427,18 @@ const query = `WITH Teams AS (
               AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
             GROUP BY Teams.Name),
    embryoLeaderboardLoss AS (
-       SELECT HomeGameLoss.Name AS TeamName, HomeGameLoss.loss AS HomeLoss, AwayGameLoss.loss AS AwayLoss, HomeGameLoss.loss + AwayGameLoss.loss AS TotalLosses
+       SELECT HomeGameLoss.TeamId, HomeGameLoss.Name AS TeamName, HomeGameLoss.loss AS HomeLoss, AwayGameLoss.loss AS AwayLoss, HomeGameLoss.loss + AwayGameLoss.loss AS TotalLosses
        FROM HomeGameLoss
                 JOIN AwayGameLoss ON HomeGameLoss.Name = AwayGameLoss.Name
    )
-SELECT embryoLeaderboardWins.TeamName, HomeWins, AwayWins, TotalWins, HomeLoss, AwayLoss, TotalLosses, TotalWins + TotalLosses AS TotalGames
+SELECT embryoLeaderboardLoss.TeamId,embryoLeaderboardWins.TeamName, HomeWins, AwayWins, TotalWins, HomeLoss, AwayLoss, TotalLosses, TotalWins + TotalLosses AS TotalGames
 FROM embryoLeaderboardWins
        JOIN embryoLeaderboardLoss
             ON embryoLeaderboardWins.TeamName = embryoLeaderboardLoss.TeamName
 ORDER BY TotalWins DESC
 LIMIT ${pageSize};`
+
+
 
     const row = await db.execute(query);
     return row[0];

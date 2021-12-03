@@ -6,7 +6,7 @@ import {
 import 'antd/dist/antd.css'
 
 import NavBar from '../components/NavBar';
-import {getLeaderboard} from '../fetcher'
+import {getLeaderboard,getTeamByIdAndYear} from '../fetcher'
 const { Column, ColumnGroup } = Table;
 const { Option } = Select;
 
@@ -19,21 +19,27 @@ class Teams extends React.Component {
 
     this.state = {
       leaderboardResults: [],
+      playersInTeamResults: [],
+      year: 2014
     }
 
     this.yearOnChange = this.yearOnChange.bind(this)
   }
 
 
-//   goToMatch(matchId) {
-//     window.location = `/matches?id=${matchId}`
-//   }
+   showTeamMembers(value) {
+    getTeamByIdAndYear(value,this.state.year).then(res => {
+      this.setState({ playersInTeamResults: res.result })
+    })
+  }
 
   yearOnChange(value) {
+    this.state.year = value
     getLeaderboard(value).then(res => {
-        console.log("Year is changed");
-      this.setState({ leaderboardResults: res.result })
+      this.setState({ leaderboardResults: res.result})
+      this.setState({playersInTeamResults: []})
     })
+    console.log("Year is changed to: " + this.state.year)
   }
 
   componentDidMount() {
@@ -41,8 +47,6 @@ class Teams extends React.Component {
       console.log(res)
       this.setState({ leaderboardResults: res.result })
     })
-
- 
   }
 
 
@@ -53,7 +57,7 @@ class Teams extends React.Component {
         <NavBar />
 
         <div style={{ width: '70vw', margin: '0 auto', marginTop: '2vh' }}>
-          <h3>Teams</h3>
+          <h3>Leaderboard</h3>
           <Select defaultValue="2011" style={{ width: 120 }} onChange={this.yearOnChange}>
              <Option value="2011">2011</Option>
              <Option value="2012">2012</Option>
@@ -62,23 +66,47 @@ class Teams extends React.Component {
              <Option value="2015">2015</Option>
           </Select>
           
-          <Table dataSource={this.state.leaderboardResults} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 5}}>
+          <Table onRow={(record, rowIndex) => {
+    return {
+      onClick: event => {this.showTeamMembers(record.TeamId)}, 
+    };
+  }}dataSource={this.state.leaderboardResults} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 5}}>
+          <Column title="TeamId" dataIndex="TeamId" key="TeamId"/>
           <Column title="TeamName" dataIndex="TeamName" key="TeamName"/>
           <ColumnGroup title="Wins">
-              <Column title="HomeWins" dataIndex="HomeWins" key="HomeWins" sorter= {(a, b) => a.HomeWins.localeCompare(b.HomeWins)}/>
-              <Column title="AwayWins" dataIndex="AwayWins" key="AwayWins" sorter= {(a, b) => a.AwayWins.localeCompare(b.AwayWins)}/>
-              <Column title="TotalWins" dataIndex="TotalWins" key="TotalWins" sorter= {(a, b) => a.TotalWins.localeCompare(b.TotalWins)}/>
+              <Column title="HomeWins" dataIndex="HomeWins" key="HomeWins" sorter= {(a, b) => a.HomeWins - b.HomeWins}/>
+              <Column title="AwayWins" dataIndex="AwayWins" key="AwayWins" sorter= {(a, b) => a.AwayWins - b.AwayWins}/>
+              <Column title="TotalWins" dataIndex="TotalWins" key="TotalWins" sorter= {(a, b) => a.TotalWins - b.TotalWins}/>
           </ColumnGroup>
 
           <ColumnGroup title="Loss">
-              <Column title="HomeLoss" dataIndex="HomeLoss" key="HomeLoss" sorter= {(a, b) => a.HomeLoss.localeCompare(b.HomeLoss)}/>
-              <Column title="AwayLoss" dataIndex="AwayLoss" key="AwayLoss" sorter= {(a, b) => a.AwayLoss.localeCompare(b.AwayLoss)}/>
-              <Column title="TotalLosses" dataIndex="TotalLosses" key="TotalLosses" sorter= {(a, b) => a.TotalLosses.localeCompare(b.TotalLosses)}/>
+              <Column title="HomeLoss" dataIndex="HomeLoss" key="HomeLoss" sorter= {(a, b) => a.HomeLoss - b.HomeLoss}/>
+              <Column title="AwayLoss" dataIndex="AwayLoss" key="AwayLoss" sorter= {(a, b) => a.AwayLoss - b.AwayLoss}/>
+              <Column title="TotalLosses" dataIndex="TotalLosses" key="TotalLosses" sorter= {(a, b) => a.TotalLosses - b.TotalLosses}/>
           </ColumnGroup>
              <Column title="TotalGames" dataIndex="TotalGames" key="TotalGames"/>
           </Table>
 
         </div>
+
+
+
+
+
+
+
+        <div style={{ width: '70vw', margin: '0 auto', marginTop: '5vh' }}>
+          <h3>Players in the Team</h3>
+          <Table dataSource={this.state.playersInTeamResults} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 5,showQuickJumper:true}}>
+          <Column title="FirstName" dataIndex="FirstName" key="FirstName"/>
+          <Column title="LastName" dataIndex="LastName" key="LastName"/>
+          <Column title="BirthCountry" dataIndex="BirthCountry" key="BirthCountry"/>
+          <Column title="DebutDate" dataIndex="DebutDate" key="DebutDate"/>
+          </Table>
+        </div>
+
+
+
 
 
       </div>
