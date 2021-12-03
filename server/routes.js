@@ -445,6 +445,68 @@ LIMIT ${pageSize};`
     throw new Error('Error executing the query' + err);
   }}
 
+const searchPlayers = async(db, playerName, birthCountry, bornBefore, bornAfter, debutBefore, debutAfter, 
+                            minHeight, maxHeight, minWeight, maxWeight, battingHand, throwingHand, 
+                            page, pagesize) => {
+
+  try {
+
+    var query = `SELECT * FROM Player WHERE TRUE`;
+
+    if (playerName) {
+      query = `${query} AND GivenName LIKE '%${playerName}%'`
+    }
+    if (birthCountry) {
+      query = `${query} AND BirthCountry LIKE '%${birthCountry}%'`
+    }
+    if (bornBefore) {
+      query = `${query} AND BirthDate <= '${bornBefore}'`
+    }
+    if (bornAfter) {
+      query = `${query} AND BirthDate >= '${bornAfter}'`
+    }
+    if (debutBefore) {
+      query = `${query} AND DebutDate <= '${debutBefore}'`
+    }
+    if (debutAfter) {
+      query = `${query} AND DebutDate >= '${debutAfter}'`
+    }
+    if (minHeight) {
+      query = `${query} AND Height >= ${minHeight}`
+    }
+    if (maxHeight) {
+      query = `${query} AND Height <= ${maxHeight}`
+    }
+    if (minWeight) {
+      query = `${query} AND Weight >= ${minWeight}`
+    }
+    if (maxWeight) {
+      query = `${query} AND Weight <= ${maxWeight}`
+    }
+    if (battingHand) {
+      query = `${query} AND Bats = '${battingHand}'`
+    }
+    if (throwingHand) {
+      query = `${query} AND Throws = '${throwingHand}'`
+    }
+    
+    query = `${query} ORDER BY ID ASC`
+    
+    if (page) {
+      page_size = pagesize ? pagesize : 10
+      const offset = (page - 1) * page_size
+      query = `${query} LIMIT ${offset}, ${page_size}`
+    }
+
+    const rows = await db.execute(query);
+    return rows[0];
+  } 
+  catch (err) {
+    throw new Error('Error executing the query');
+  }
+
+}
+
 const getPlayerPitchingStats = async(db, playerID, dateStart, dateEnd, againstTeams, forTeams) => {
   try {
     
@@ -790,5 +852,5 @@ const getPlayerBattingStats = async(db, playerID, dateStart, dateEnd, againstTea
 }
 
 module.exports = {
-  connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams/*, getBattingLeadersTeams*/, getTeamByIdAndYear, getLeaderboardBySeason, getPlayerPitchingStats, getPlayerBattingStats
+  connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams/*, getBattingLeadersTeams*/, getTeamByIdAndYear, getLeaderboardBySeason, getPlayerPitchingStats, getPlayerBattingStats, searchPlayers
 };
