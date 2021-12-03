@@ -1,4 +1,5 @@
 import config from './config.json'
+const axios = require('axios');
 
 /*
 const getAllMatches = async (page, pagesize, league) => {
@@ -44,33 +45,20 @@ const getPlayerSearch = async (name, nationality, club, rating_high, rating_low,
 }
 */
 
-const getLeaderboard = async (year) => {
-    var res = await fetch(`http://${config.server_host}:${config.server_port}/teams/season/leaderboard?year=${year}`, {
-        method: 'GET',
-    })
-    return res.json()
+// const getLeaderboard = async (year) => {
+//     var res = await fetch(`http://${config.server_host}:${config.server_port}/teams/season/leaderboard?year=${year}`, {
+//         method: 'GET',
+//     })
+//     return res;
+// }
+
+async function getLeaderboard(year) {
+    const url = `http://${config.server_host}:${config.server_port}/teams/season/leaderboard?year=${year}`;
+    const response = await axios.get(url);
+    return response.data;
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 export {
-//     getAllMatches,
-//     getAllPlayers,
-//     getMatch,
-//     getPlayer,
-//     getMatchSearch,
-//     getPlayerSearch
 getLeaderboard
  }
