@@ -32,7 +32,6 @@ h3 {
 
 .team1-wins {
     background-color: blue;
-    width: 25%;
     height: 35px;
     margin-left: auto; 
     margin-right: 0;
@@ -41,7 +40,6 @@ h3 {
 
 .team1-avg-runs {
     background-color: blue;
-    width: 10%;
     height: 35px;
     margin-left: auto; 
     margin-right: 0;
@@ -51,7 +49,6 @@ h3 {
 
 .team1-max-runs {
     background-color: blue;
-    width: 30%;
     height: 35px;
     margin-left: auto; 
     margin-right: 0;
@@ -60,7 +57,6 @@ h3 {
 
 .team1-min-runs {
     background-color: blue;
-    width: 50%;
     height: 35px;
     margin-left: auto; 
     margin-right: 0;
@@ -92,7 +88,6 @@ h3 {
 
 .team2-wins {
     background-color: red;
-    width: 25%;
     height: 35px;
     margin-right: auto; 
     margin-left: 0;
@@ -101,7 +96,6 @@ h3 {
 
 .team2-avg-runs {
     background-color: red;
-    width: 10%;
     height: 35px;
     margin-right: auto; 
     margin-left: 0;
@@ -111,7 +105,6 @@ h3 {
 
 .team2-max-runs {
     background-color: red;
-    width: 30%;
     height: 35px;
     margin-right: auto; 
     margin-left: 0;
@@ -120,10 +113,10 @@ h3 {
 
 .team2-min-runs {
     background-color: red;
-    width: 50%;
     height: 35px;
     margin-right: auto; 
     margin-left: 0;
+    margin-bottom: 10px;
 }
 
 .stats {
@@ -154,4 +147,8 @@ h3 {
 
 hr {
     color:#E25;
+}
+
+h4 {
+    text-align: center;
 }

@@ -1,4 +1,46 @@
 import config from './config.json'
+const axios = require('axios');
+
+async function getTeams() {
+    const url = `http://${config.server_host}:${config.server_port}/teams`;
+    const response = await axios.get(url);
+    return response.data;
+}
+
+async function geth2hteams(team1, team2, field) {
+    team1 = team1.split(' ').join('-');
+    team2 = team2.split(' ').join('-');
+    if (field === undefined){
+        field = "";
+    }
+    const url = `http://${config.server_host}:${config.server_port}/head2head/teams/${team1}/${team2}?field=${field}`;
+    const response = await axios.get(url);
+    return response.data;
+}
+
+async function getGames(team1, team2) {
+    team1 = team1.split(' ').join('-');
+    team2 = team2.split(' ').join('-');
+    const url = `http://${config.server_host}:${config.server_port}/head2head/teams/games/${team1}/${team2}`
+    const response = await axios.get(url);
+    return response.data;
+}
+
+async function getPitchingLeadersTeam(team1, team2) {
+    team1 = team1.split(' ').join('-');
+    team2 = team2.split(' ').join('-');
+    const url = `http://${config.server_host}:${config.server_port}/head2head/teams/pitchers/${team1}/${team2}`;
+    const response = await axios.get(url);
+    return response.data;
+}
+
+async function getBattingLeadersTeam(team1, team2) {
+    team1 = team1.split(' ').join('-');
+    team2 = team2.split(' ').join('-');
+    const url = `http://${config.server_host}:${config.server_port}/head2head/teams/batters/${team1}/${team2}`;
+    const response = await axios.get(url);
+    return response.data;
+}
 
 /*
 const getAllMatches = async (page, pagesize, league) => {
@@ -63,8 +105,6 @@ const getLeaderboard = async (year) => {
 
 
 
-
-
 export {
 //     getAllMatches,
 //     getAllPlayers,
@@ -72,5 +112,10 @@ export {
 //     getPlayer,
 //     getMatchSearch,
 //     getPlayerSearch
-getLeaderboard
+getLeaderboard,
+getTeams,
+geth2hteams,
+getGames,
+getPitchingLeadersTeam,
+getBattingLeadersTeam,
  }

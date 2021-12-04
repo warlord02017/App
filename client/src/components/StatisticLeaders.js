@@ -1,10 +1,108 @@
+import {useEffect, useState} from 'react';
 import '../stylesheets/StatisticLeaders.css';
 import {Table} from 'react-bootstrap';
 
+const lib = require('../fetcher.js');
+
+
 function StatisticLeaders() {
+    const [isLoading, setIsLoading] = useState(true);
+    const [team1, setTeam1] = useState();
+    const [team2, setTeam2] = useState();
+
+    const [batData, setBatData] = useState([]);
+    const [topBatters, setTopBatters] = useState(5);
+    const [batByPitch, setBatByPitch] = useState();
+    const [batByHR, setBatByHR] = useState();
+    const [batByBA, setBatByBA] = useState();
+
+    function sortByPitch(arr) {
+        arr.sort((a, b) => a.at_bats > b.at_bats ? -1 : 1);
+        return arr;
+    }
+
+    function sortByHR(arr) {
+        arr.sort((a, b) => a.homeruns > b.homeruns ? -1 : 1);
+        return arr;
+    }
+
+    function sortByBA(arr) {
+        arr.sort((a, b) => a.batting_avg > b.batting_avg ? -1 : 1);
+        return arr;
+    }
+
+    const [pitchData, setPitchData] = useState([]);
+    const [topPitchers, setTopPitchers] = useState(5);
+    const [pitchByBat, setPitchByBat] = useState();
+    const [pitchBySO, setPitchBySO] = useState();
+    const [pitchBySR, setPitchBySR] = useState();
+
+    function sortByBattersFaced(arr) {
+        arr.sort((a, b) => a.batters_faced > b.batters_faced ? -1 : 1);
+        return arr;
+    }
+
+    function sortBySO(arr) {
+        arr.sort((a, b) => a.strikeouts > b.strikeouts ? -1 : 1);
+        return arr;
+    }
+
+    function sortBySR(arr) {
+        arr.sort((a, b) => a.strikeout_rate > b.strikeout_rate ? -1 : 1);
+        return arr;
+    }
+
+    useEffect(() => {
+        const url = window.location.href;
+        const t1_name = (url.split('/').pop().split('-')).join(' ');
+        const t2_name = (url.split('/').slice(-2)[0]).split('-').join(' ');
+        lib.getPitchingLeadersTeam(t1_name, t2_name).then((res) => {
+            setPitchData(res.result);
+            setPitchByBat(sortByBattersFaced(res.result).slice(0, topPitchers));
+            setPitchBySO(sortBySO(res.result).slice(0, topPitchers));
+            setPitchBySR(sortBySR(res.result).slice(0, topPitchers));
+            setTeam1(t1_name);
+            setTeam2(t2_name);
+
+            lib.getBattingLeadersTeam(t1_name, t2_name).then((res) => {
+                setBatData(res.result);
+                setBatByPitch(sortByPitch(res.result).slice(0, topBatters));
+                setBatByBA(sortByBA(res.result).slice(0, topBatters));
+                setBatByHR(sortByHR(res.result).slice(0, topBatters));
+                setIsLoading(false);
+            });
+        });
+    }, []);
+
+    function handleChange(e){
+        setTopPitchers(e.target.value);
+    }
+
+    function handleChangeBat(e){
+        setTopBatters(e.target.value);
+    }
+
+    useEffect(() => {
+        setBatByPitch(sortByPitch(batData).slice(0, topBatters));
+        setBatByHR(sortByHR(batData).slice(0, topBatters));
+        setBatByBA(sortByBA(batData).slice(0, topBatters));
+    }, [topBatters]);
+
+    useEffect(() => {
+        setPitchByBat(sortByBattersFaced(pitchData).slice(0, topPitchers));
+        setPitchBySO(sortBySO(pitchData).slice(0, topPitchers));
+        setPitchBySR(sortBySR(pitchData).slice(0, topPitchers));
+    }, [topPitchers]);
+
     return (
+        !isLoading && 
         <div>
             <h2>Top Batting Performers</h2>
+            <select id="t1" style={{width:'7%'}}class="form-select" aria-label="Default select example" value={topBatters} onChange={handleChangeBat}>
+                    <option selected>5</option>
+                    <option selected>10</option>
+                    <option selected>20</option>
+            </select>
             <hr></hr>
             <div className="leaders-outer">
                 <div className="hr-leaders">
@@ -19,36 +117,14 @@ function StatisticLeaders() {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                            <td style={{color: 'blue'}}>1</td>
-                            <td style={{color: 'blue'}}>Mark</td>
-                            <td style={{color: 'blue'}}>Otto</td>
-                            <td style={{color: 'blue'}}>50</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'blue'}}>2</td>
-                            <td style={{color: 'blue'}}>Jacob</td>
-                            <td style={{color: 'blue'}}>Thornton</td>
-                            <td style={{color: 'blue'}}>40</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'red'}}>3</td>
-                            <td style={{color: 'red'}}>John</td>
-                            <td style={{color: 'red'}}>Ortiz</td>
-                            <td style={{color: 'red'}}>30</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'blue'}}>4</td>
-                            <td style={{color: 'blue'}}>John</td>
-                            <td style={{color: 'blue'}}>Ortiz</td>
-                            <td style={{color: 'blue'}}>30</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'red'}}>5</td>
-                            <td style={{color: 'red'}}>John</td>
-                            <td style={{color: 'red'}}>Ortiz</td>
-                            <td style={{color: 'red'}}>30</td>
-                            </tr>
+                        {batByHR.map((e, idx) => (
+                                <tr>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{idx + 1}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.firstname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.lastname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.homeruns}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </Table>
                 </div>
@@ -64,86 +140,48 @@ function StatisticLeaders() {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                            <td style={{color: 'blue'}}>1</td>
-                            <td style={{color: 'blue'}}>Mark</td>
-                            <td style={{color: 'blue'}}>Otto</td>
-                            <td style={{color: 'blue'}}>50</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'blue'}}>2</td>
-                            <td style={{color: 'blue'}}>Jacob</td>
-                            <td style={{color: 'blue'}}>Thornton</td>
-                            <td style={{color: 'blue'}}>40</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'red'}}>3</td>
-                            <td style={{color: 'red'}}>John</td>
-                            <td style={{color: 'red'}}>Ortiz</td>
-                            <td style={{color: 'red'}}>30</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'blue'}}>4</td>
-                            <td style={{color: 'blue'}}>John</td>
-                            <td style={{color: 'blue'}}>Ortiz</td>
-                            <td style={{color: 'blue'}}>30</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'red'}}>5</td>
-                            <td style={{color: 'red'}}>John</td>
-                            <td style={{color: 'red'}}>Ortiz</td>
-                            <td style={{color: 'red'}}>30</td>
-                            </tr>
+                        {batByBA.map((e, idx) => (
+                                <tr>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{idx + 1}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.firstname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.lastname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.batting_avg}</td>
+                                </tr>
+                            ))}
+   
                         </tbody>
                     </Table>
                 </div> 
                 <div className="eye-leaders">
-                    <h5>Best Eye</h5>
+                    <h5>Most bats</h5>
                     <Table striped bordered hover variant="light">
                         <thead>
                             <tr>
                             <th>Rank</th>
                             <th>First Name</th>
                             <th>Last Name</th>
-                            <th>Walks</th>
+                            <th>At-Bats</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                            <td style={{color: 'blue'}}>1</td>
-                            <td style={{color: 'blue'}}>Mark</td>
-                            <td style={{color: 'blue'}}>Otto</td>
-                            <td style={{color: 'blue'}}>50</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'blue'}}>2</td>
-                            <td style={{color: 'blue'}}>Jacob</td>
-                            <td style={{color: 'blue'}}>Thornton</td>
-                            <td style={{color: 'blue'}}>40</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'red'}}>3</td>
-                            <td style={{color: 'red'}}>John</td>
-                            <td style={{color: 'red'}}>Ortiz</td>
-                            <td style={{color: 'red'}}>30</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'blue'}}>4</td>
-                            <td style={{color: 'blue'}}>John</td>
-                            <td style={{color: 'blue'}}>Ortiz</td>
-                            <td style={{color: 'blue'}}>30</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'red'}}>5</td>
-                            <td style={{color: 'red'}}>John</td>
-                            <td style={{color: 'red'}}>Ortiz</td>
-                            <td style={{color: 'red'}}>30</td>
-                            </tr>
+                        {batByPitch.map((e, idx) => (
+                                <tr>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{idx + 1}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.firstname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.lastname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.at_bats}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </Table>
                 </div>               
             </div>
             <h2>Top Pitching Performers</h2>
+            <select id="t1" style={{width:'7%'}}class="form-select" aria-label="Default select example" value={topPitchers} onChange={handleChange}>
+                    <option selected>5</option>
+                    <option selected>10</option>
+                    <option selected>20</option>
+            </select>
             <hr></hr>
             <div className="leaders-outer">
                 <div className="hr-leaders">
@@ -158,36 +196,14 @@ function StatisticLeaders() {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                            <td style={{color: 'blue'}}>1</td>
-                            <td style={{color: 'blue'}}>Mark</td>
-                            <td style={{color: 'blue'}}>Otto</td>
-                            <td style={{color: 'blue'}}>50</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'blue'}}>2</td>
-                            <td style={{color: 'blue'}}>Jacob</td>
-                            <td style={{color: 'blue'}}>Thornton</td>
-                            <td style={{color: 'blue'}}>40</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'red'}}>3</td>
-                            <td style={{color: 'red'}}>John</td>
-                            <td style={{color: 'red'}}>Ortiz</td>
-                            <td style={{color: 'red'}}>30</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'blue'}}>4</td>
-                            <td style={{color: 'blue'}}>John</td>
-                            <td style={{color: 'blue'}}>Ortiz</td>
-                            <td style={{color: 'blue'}}>30</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'red'}}>5</td>
-                            <td style={{color: 'red'}}>John</td>
-                            <td style={{color: 'red'}}>Ortiz</td>
-                            <td style={{color: 'red'}}>30</td>
-                            </tr>
+                            {pitchBySO.map((e, idx) => (
+                                <tr>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{idx + 1}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.firstname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.lastname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.strikeouts}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </Table>
                 </div>
@@ -203,81 +219,37 @@ function StatisticLeaders() {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                            <td style={{color: 'blue'}}>1</td>
-                            <td style={{color: 'blue'}}>Mark</td>
-                            <td style={{color: 'blue'}}>Otto</td>
-                            <td style={{color: 'blue'}}>50</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'blue'}}>2</td>
-                            <td style={{color: 'blue'}}>Jacob</td>
-                            <td style={{color: 'blue'}}>Thornton</td>
-                            <td style={{color: 'blue'}}>40</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'red'}}>3</td>
-                            <td style={{color: 'red'}}>John</td>
-                            <td style={{color: 'red'}}>Ortiz</td>
-                            <td style={{color: 'red'}}>30</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'blue'}}>4</td>
-                            <td style={{color: 'blue'}}>John</td>
-                            <td style={{color: 'blue'}}>Ortiz</td>
-                            <td style={{color: 'blue'}}>30</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'red'}}>5</td>
-                            <td style={{color: 'red'}}>John</td>
-                            <td style={{color: 'red'}}>Ortiz</td>
-                            <td style={{color: 'red'}}>30</td>
-                            </tr>
+                        {pitchBySR.map((e, idx) => (
+                                <tr>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{idx + 1}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.firstname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.lastname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.strikeout_rate}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </Table>
                 </div> 
                 <div className="eye-leaders">
-                    <h5>Least Hits Allowed</h5>
+                    <h5>Batters Faced</h5>
                     <Table striped bordered hover variant="light">
                         <thead>
                             <tr>
                             <th>Rank</th>
                             <th>First Name</th>
                             <th>Last Name</th>
-                            <th>Hits Allowed</th>
+                            <th>Batters</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                            <td style={{color: 'blue'}}>1</td>
-                            <td style={{color: 'blue'}}>Mark</td>
-                            <td style={{color: 'blue'}}>Otto</td>
-                            <td style={{color: 'blue'}}>50</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'blue'}}>2</td>
-                            <td style={{color: 'blue'}}>Jacob</td>
-                            <td style={{color: 'blue'}}>Thornton</td>
-                            <td style={{color: 'blue'}}>40</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'red'}}>3</td>
-                            <td style={{color: 'red'}}>John</td>
-                            <td style={{color: 'red'}}>Ortiz</td>
-                            <td style={{color: 'red'}}>30</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'blue'}}>4</td>
-                            <td style={{color: 'blue'}}>John</td>
-                            <td style={{color: 'blue'}}>Ortiz</td>
-                            <td style={{color: 'blue'}}>30</td>
-                            </tr>
-                            <tr>
-                            <td style={{color: 'red'}}>5</td>
-                            <td style={{color: 'red'}}>John</td>
-                            <td style={{color: 'red'}}>Ortiz</td>
-                            <td style={{color: 'red'}}>30</td>
-                            </tr>
+                        {pitchByBat.map((e, idx) => (
+                                <tr>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{idx + 1}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.firstname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.lastname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.batters_faced}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </Table>
                 </div>               

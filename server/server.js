@@ -29,6 +29,17 @@ app.get('/', (req, res) => {
     res.json({ message: 'Welcome to our Baseball API' });
 });
 
+app.get('/teams', async (req, res) => {
+    try {
+        const result = await lib.getTeams(db);
+        const data = result.map((d) => d.NAME);
+        res.status(200).json({data});
+        return;
+    } catch (err) {
+        res.status(400).json();
+    }
+});
+
 app.get('/player/:id', async (req, res) => {
     try {
       if (req.params.id === undefined) {
@@ -122,7 +133,7 @@ app.get('/head2head/teams/pitchers/:teamOne/:teamTwo', async (req, res) => {
         res.status(404).json({ error: err.message });
     }
 })
-/*
+
 app.get('/head2head/teams/batters/:teamOne/:teamTwo', async (req, res) => {
     try {
         if (req.params.teamOne === undefined) {
@@ -139,7 +150,7 @@ app.get('/head2head/teams/batters/:teamOne/:teamTwo', async (req, res) => {
         res.status(404).json({ error: err.message });
     }
 })
-*/
+
 
 /*this endpoint takes an optional query param "year" */
 app.get('/teams/:teamId', async (req, res) => {

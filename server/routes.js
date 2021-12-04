@@ -20,6 +20,17 @@ const connect = async () => {
   }
 };
 
+const getTeams = async(db) => {
+  try {
+    const query = 'SELECT DISTINCT(NAME) FROM TeamName WHERE YEAR>=2011';
+    const row = await db.execute(query);
+    return row[0];
+  }
+   catch (err) {
+     throw new Error('Error executing the query');
+   }
+}
+
 // get player by id
 const getPlayer = async (db, id) => {
   try {
@@ -168,7 +179,7 @@ const getSnapShotTeams = async (db, team1, team2, field) => {
                     WHERE Game.AwayTeam IN (SELECT DISTINCT TeamID FROM TeamName WHERE Name = '${team2}')
                     AND Game.HomeTeam IN (SELECT DISTINCT TeamID FROM TeamName WHERE Name = '${team1}')
                 )
-                SELECT Name as team, (homewins.wins + awaywins.wins) AS wins, SUM(score) as total_runs, AVG(score), MAX(score) as max_runs, MIN(score) as min_runs
+                SELECT Name as team, (homewins.wins + awaywins.wins) AS wins, SUM(score) as total_runs, AVG(score) as avg_score, MAX(score) as max_runs, MIN(score) as min_runs
                 FROM games
                 JOIN teams
                 ON teams.TeamID = games.team
@@ -202,7 +213,7 @@ const getSnapShotTeams = async (db, team1, team2, field) => {
                   WHERE Game.AwayTeam IN (SELECT DISTINCT TeamID FROM TeamName WHERE Name = '${team2}')
                   AND Game.HomeTeam IN (SELECT DISTINCT TeamID FROM TeamName WHERE Name = '${team1}')
               )
-              SELECT Name as team, awaywins.wins AS wins, SUM(score) as total_runs, AVG(score), MAX(score) as max_runs, MIN(score) as min_runs
+              SELECT Name as team, awaywins.wins AS wins, SUM(score) as total_runs, AVG(score) as avg_score, MAX(score) as max_runs, MIN(score) as min_runs
               FROM games
               JOIN teams
               ON teams.TeamID = games.team
@@ -234,7 +245,7 @@ const getSnapShotTeams = async (db, team1, team2, field) => {
                       WHERE Game.AwayTeam IN (SELECT DISTINCT TeamID FROM TeamName WHERE Name = '${team1}')
                       AND Game.HomeTeam IN (SELECT DISTINCT TeamID FROM TeamName WHERE Name = '${team2}')
                   )
-                  SELECT Name as team, homewins.wins AS wins, SUM(score) as total_runs, AVG(score), MAX(score) as max_runs, MIN(score) as min_runs
+                  SELECT Name as team, homewins.wins AS wins, SUM(score) as total_runs, AVG(score) as avg_score, MAX(score) as max_runs, MIN(score) as min_runs
                   FROM games
                   JOIN teams
                   ON teams.TeamID = games.team
@@ -615,7 +626,134 @@ const getPlayerPitchingStats = async(db, playerID, dateStart, dateEnd, againstTe
     console.log(err);
     throw new Error('Error executing the query');
   }
+}
 
+const getBattingLeadersTeams = async (db, team1, team2) => {
+  try {
+    team1 = team1.split('-').join(' ');
+    team2 = team2.split('-').join(' ');
+    const query = `WITH teams AS (
+                  SELECT DISTINCT Name, TeamID
+                  FROM TeamName
+                  WHERE Name = '${team2}' or Name = '${team1}'
+                  AND TeamName.Year >= 2011
+              ),
+              games_t1 AS (
+                  SELECT year(Game.Date) as year, Event.Pitcher AS pitcher, TeamMember.TeamID AS team, Event.Batter AS batter, Event.EventType as event
+                  FROM Event
+                  JOIN Game
+                  ON Event.GameID = Game.ID
+                  JOIN TeamMember
+                  ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Batter
+                  WHERE Game.Date >= 2011
+                  AND TeamMember.TeamID  IN (
+                                              SELECT DISTINCT TeamID
+                                              FROM TeamName
+                                              WHERE Year >= 2011 AND
+                                              Name = '${team1}'
+                                            )
+              ),
+              games_t1_stats AS (
+                  SELECT games_t1.batter, games_t1.team, games_t1.event
+                  FROM games_t1
+                  JOIN TeamMember
+                  ON games_t1.year = TeamMember.Year AND TeamMember.PlayerID = games_t1.pitcher
+                  WHERE TeamMember.TeamID IN (
+                                              SELECT DISTINCT TeamID
+                                              FROM TeamName
+                                              WHERE Year >= 2011 AND
+                                              Name = '${team2}'
+                                              )
+              ),
+              games_t2 AS (
+                  SELECT year(Game.Date) as year, Event.Pitcher AS pitcher, TeamMember.TeamID AS team, Event.Batter AS batter, Event.EventType as event
+                  FROM Event
+                  JOIN Game
+                  ON Event.GameID = Game.ID
+                  JOIN TeamMember
+                  ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Batter
+                  WHERE Game.Date >= 2011
+                  AND TeamMember.TeamID  IN (
+                                              SELECT DISTINCT TeamID
+                                              FROM TeamName
+                                              WHERE Year >= 2011 AND
+                                              Name = '${team2}'
+                                          )
+              ),
+              games_t2_stats AS (
+                  SELECT games_t2.batter, games_t2.team, games_t2.event
+                  FROM games_t2
+                  JOIN TeamMember
+                  ON games_t2.year = TeamMember.Year AND TeamMember.PlayerID = games_t2.pitcher
+                  WHERE TeamMember.TeamID IN (
+                                              SELECT DISTINCT TeamID
+                                              FROM TeamName
+                                              WHERE Year >= 2011 AND
+                                              Name = '${team1}'
+                                              )
+              ),
+              all_stats AS (
+                  SELECT *
+                  FROM games_t1_stats
+                  UNION ALL
+                  SELECT *
+                  FROM games_t2_stats
+              ),
+              homeruns AS (
+                  SELECT all_stats.batter, all_stats.team, COUNT(*) as homeruns
+                  FROM all_stats
+                  WHERE all_stats.event = 'Home run'
+                  GROUP BY all_stats.batter, all_stats.team
+              ),
+              singles AS (
+                  SELECT all_stats.batter, all_stats.team, COUNT(*) as singles
+                  FROM all_stats
+                  WHERE all_stats.event = 'Single'
+                  GROUP BY all_stats.batter, all_stats.team
+              ),
+              doubles AS (
+                  SELECT all_stats.batter, all_stats.team, COUNT(*) as doubles
+                  FROM all_stats
+                  WHERE all_stats.event = 'Double'
+                  GROUP BY all_stats.batter, all_stats.team
+              ),
+              triples AS (
+                  SELECT all_stats.batter, all_stats.team, COUNT(*) as triples
+                  FROM all_stats
+                  WHERE all_stats.event = 'Triple'
+                  GROUP BY all_stats.batter, all_stats.team
+              ),
+              appearances AS (
+                  SELECT all_stats.batter, all_stats.team, COUNT(*) as at_bats
+                  FROM all_stats
+                  GROUP BY all_stats.batter, all_stats.team
+              )
+              SELECT Player.firstname, Player.lastname, teams.Name as team, appearances.at_bats,
+                    IFNULL(homeruns.homeruns, 0) AS homeruns, IFNULL(singles.singles, 0) AS singles,
+                    IFNULL(doubles.doubles, 0) AS doubles, IFNULL(triples.triples, 0) AS triples,
+                    (IFNULL(homeruns.homeruns, 0) + IFNULL(singles.singles, 0) + IFNULL(doubles.doubles, 0)
+                        + IFNULL(triples.triples, 0)) / at_bats AS batting_avg
+              FROM appearances
+              LEFT JOIN homeruns
+              ON appearances.batter = homeruns.batter AND appearances.team = homeruns.team
+              LEFT JOIN singles
+              ON appearances.batter = singles.batter AND appearances.team = singles.team
+              LEFT JOIN doubles
+              ON appearances.batter = doubles.batter AND appearances.team = doubles.team
+              LEFT JOIN triples
+              ON appearances.batter = triples.batter AND appearances.team = triples.team
+              JOIN Player
+              ON Player.ID = appearances.batter
+              JOIN teams
+              ON teams.TeamID = appearances.team
+              WHERE at_bats > 10;`
+
+    const row = await db.execute(query);
+    return row[0];
+  } catch (err) {
+    console.log(err);
+    throw new Error('Error executing the query');
+  }
 }
 
 const getPlayerBattingStats = async(db, playerID, dateStart, dateEnd, againstTeams, forTeams) => {
@@ -790,5 +928,6 @@ const getPlayerBattingStats = async(db, playerID, dateStart, dateEnd, againstTea
 }
 
 module.exports = {
-  connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams/*, getBattingLeadersTeams*/, getTeamByIdAndYear, getLeaderboardBySeason, getPlayerPitchingStats, getPlayerBattingStats
+  connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams, getBattingLeadersTeams, getTeamByIdAndYear, getLeaderboardBySeason, getPlayerPitchingStats, getPlayerBattingStats,
+  getTeams,
 };
