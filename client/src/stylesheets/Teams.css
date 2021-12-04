@@ -1,0 +1,8 @@
+.selection {
+    width: 100%;
+    background-color: #E25;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

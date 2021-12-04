@@ -4,6 +4,7 @@ import {
   Select
 } from 'antd'
 import 'antd/dist/antd.css'
+import '../stylesheets/Teams.css';
 
 import NavBar from '../components/NavBar';
 import {getLeaderboard,getTeamByIdAndYear} from '../fetcher'
@@ -26,9 +27,19 @@ class Teams extends React.Component {
     this.yearOnChange = this.yearOnChange.bind(this)
   }
 
+  formatDate(d) {
+    let months = [ "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December" ];
+    let m = months[(d.getMonth())];
+    let day = d.getDate().toString();
+    let y = d.getFullYear().toString();
+    let res = m + "-" + day + "-" + y;
+    return res;
+  }
 
    showTeamMembers(value) {
     getTeamByIdAndYear(value,this.state.year).then(res => {
+      res.result.map((e) => {e.DebutDate = this.formatDate(new Date(e.DebutDate))});
       this.setState({ playersInTeamResults: res.result })
     })
   }
@@ -39,12 +50,10 @@ class Teams extends React.Component {
       this.setState({ leaderboardResults: res.result})
       this.setState({playersInTeamResults: []})
     })
-    console.log("Year is changed to: " + this.state.year)
   }
 
   componentDidMount() {
     getLeaderboard(2014).then(res => {
-      console.log(res)
       this.setState({ leaderboardResults: res.result })
     })
   }
@@ -55,16 +64,17 @@ class Teams extends React.Component {
     return (
       <div>
         <NavBar />
-
-        <div style={{ width: '70vw', margin: '0 auto', marginTop: '2vh' }}>
-          <h3>Leaderboard</h3>
-          <Select defaultValue="2011" style={{ width: 120 }} onChange={this.yearOnChange}>
+        <div className="selection">
+        <h3>Teams Leaderboard</h3>
+          <Select defaultValue="2011" style={{ marginLeft: '2%', width: 120 }} onChange={this.yearOnChange}>
              <Option value="2011">2011</Option>
              <Option value="2012">2012</Option>
              <Option value="2013">2013</Option>
              <Option value="2014">2014</Option>
              <Option value="2015">2015</Option>
           </Select>
+        </div>
+        <div style={{ width: '70vw', margin: '0 auto', marginTop: '2vh' }}>
           
           <Table onRow={(record, rowIndex) => {
     return {
@@ -88,12 +98,6 @@ class Teams extends React.Component {
           </Table>
 
         </div>
-
-
-
-
-
-
 
         <div style={{ width: '70vw', margin: '0 auto', marginTop: '5vh' }}>
           <h3>Players in the Team</h3>
