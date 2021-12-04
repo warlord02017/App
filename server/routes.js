@@ -394,7 +394,7 @@ const getLeaderboardBySeason = async (db, year, pagesize) => {
     const Year = (year) ? parseInt(year) : 2014;
     var YearString = Year.toString();
     const startDate = YearString.concat("-03-01");
-    const pageSize = (pagesize) ? pagesize : 10;
+    const pageSize = (pagesize) ? pagesize : 100;
     const YearPlusOne = Year + 1;
     var YearPlusOneString = YearPlusOne.toString();
     const endDate = YearPlusOneString.concat("-02-20");
