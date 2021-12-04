@@ -272,7 +272,7 @@ const getPitchingLeadersTeams = async (db, team1, team2, batters_faced, avg) => 
                     ON Event.GameID = Game.ID
                     JOIN TeamMember
                     ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Pitcher
-                    WHERE Game.Date >= 2011
+                    WHERE Game.Date >= '2011-01-01'
                     AND TeamMember.TeamID  IN (
                                                 SELECT DISTINCT TeamID
                                                 FROM TeamName
@@ -299,7 +299,7 @@ const getPitchingLeadersTeams = async (db, team1, team2, batters_faced, avg) => 
                     ON Event.GameID = Game.ID
                     JOIN TeamMember
                     ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Pitcher
-                    WHERE Game.Date >= 2011
+                    WHERE Game.Date >= '2011-01-01'
                     AND TeamMember.TeamID  IN (
                                                 SELECT DISTINCT TeamID
                                                 FROM TeamName
