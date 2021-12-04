@@ -40,6 +40,24 @@ app.get('/teams', async (req, res) => {
     }
 });
 
+app.get('/pitchers', async (req, res) => {
+    try {
+        const result = await lib.getAllPitchers(db);
+        res.status(200).json({result});
+    } catch (err) {
+        res.status(400).json();
+    }
+});
+
+app.get('/batters', async (req, res) => {
+    try {
+        const result = await lib.getAllBatters(db);
+        res.status(200).json({result});
+    } catch (err) {
+        res.status(400).json();
+    }
+});
+
 app.get('/player/:id', async (req, res) => {
     try {
       if (req.params.id === undefined) {

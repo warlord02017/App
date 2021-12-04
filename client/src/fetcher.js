@@ -7,6 +7,18 @@ async function getTeams() {
     return response.data;
 }
 
+async function getPitchers() {
+    const url = `http://${config.server_host}:${config.server_port}/pitchers`;
+    const response = await axios.get(url);
+    return response.data;
+}
+
+async function getBatters() {
+    const url = `http://${config.server_host}:${config.server_port}/batters`;
+    const response = await axios.get(url);
+    return response.data;
+}
+
 async function geth2hteams(team1, team2, field) {
     team1 = team1.split(' ').join('-');
     team2 = team2.split(' ').join('-');
@@ -14,6 +26,12 @@ async function geth2hteams(team1, team2, field) {
         field = "";
     }
     const url = `http://${config.server_host}:${config.server_port}/head2head/teams/${team1}/${team2}?field=${field}`;
+    const response = await axios.get(url);
+    return response.data;
+}
+
+async function geth2hPlayers(pit, bat) {
+    const url =  `http://${config.server_host}:${config.server_port}/head2head/players/?pitcher=${pit}&batter=${bat}`;
     const response = await axios.get(url);
     return response.data;
 }
@@ -55,7 +73,10 @@ async function getTeamByIdAndYear(teamId, year) {
 }
 
 export {
+    getPitchers,
+    getBatters,
     getTeamByIdAndYear,
+    geth2hPlayers,
     getLeaderboard,
     getTeams,
     geth2hteams,

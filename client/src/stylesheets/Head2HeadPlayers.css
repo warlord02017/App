@@ -1,0 +1,25 @@
+.selection {
+    width: 100%;
+    background-color: #E25;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.h2h-go {
+    margin-left: 15px;
+    background: #2D3138;
+    color: white;
+    display: inline-block;
+    line-height: 60px;
+    border-radius: 30px;
+    border: none;
+    font-size: 24px;
+    font-weight: 900;
+    padding: 0 25px 0 30px;
+}
+
+.h2h-go:hover {
+    color:#E25;
+}

@@ -31,7 +31,32 @@ const getTeams = async(db) => {
    }
 }
 
-// get player by id
+const getAllBatters = async(db) => {
+  try {
+    const query = `SELECT DISTINCT (Player.ID), Player.FirstName, Player.LastName
+                    FROM Event
+                    JOIN Player
+                    ON Event.Batter = Player.ID;`
+    const row = await db.execute(query);
+    return row[0];
+  } catch (err) {
+    throw new Error('Error executing the query');
+  }
+}
+
+const getAllPitchers = async(db) => {
+  try {
+    const query = `SELECT DISTINCT (Player.ID), Player.FirstName, Player.LastName
+                    FROM Event
+                    JOIN Player
+                    ON Event.Pitcher = Player.ID;`
+    const row = await db.execute(query);
+    return row[0];
+  } catch (err) {
+    throw new Error('Error executing the query');
+  }
+}
+
 const getPlayer = async (db, id) => {
   try {
     const query = 'SELECT * FROM Player WHERE ID = ?';
@@ -50,11 +75,10 @@ const headToHeadPlayers = async (db, batter_id, pitcher_id) => {
       const query = `
           SELECT Event.EventType AS Outcome, COUNT(*) AS Occurrences
           FROM Event
-          WHERE Event.Batter = ?
-          AND Event.Pitcher = ?
+          WHERE Event.Batter = ${batter_id}
+          AND Event.Pitcher = ${pitcher_id}
           GROUP BY Event.EventType;`
-      const params = [batter_id, pitcher_id];
-      const row = await db.execute(query, params);
+      const row = await db.execute(query);
       return row[0];
     } catch (err) {
       console.log(err);
@@ -983,15 +1007,13 @@ const getPlayerBattingStats = async(db, playerID, dateStart, dateEnd, againstTea
     return res;
 
   }
-
   catch (err) {
     console.log(err);
     throw new Error('Error executing the query');
   }
-
 }
 
 module.exports = {
   connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams, getBattingLeadersTeams, getTeamByIdAndYear, getLeaderboardBySeason, getPlayerPitchingStats, getPlayerBattingStats,
-  getTeams,
+  getTeams, getAllBatters, getAllPitchers,
 };
