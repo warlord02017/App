@@ -283,7 +283,7 @@ const getPitchingLeadersTeams = async (db, team1, team2, batters_faced, avg) => 
                     ON Event.GameID = Game.ID
                     JOIN TeamMember
                     ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Pitcher
-                    WHERE Game.Date >= 2011
+                    WHERE Game.Date >= '2011-01-01'
                     AND TeamMember.TeamID  IN (
                                                 SELECT DISTINCT TeamID
                                                 FROM TeamName
@@ -310,7 +310,7 @@ const getPitchingLeadersTeams = async (db, team1, team2, batters_faced, avg) => 
                     ON Event.GameID = Game.ID
                     JOIN TeamMember
                     ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Pitcher
-                    WHERE Game.Date >= 2011
+                    WHERE Game.Date >= '2011-01-01'
                     AND TeamMember.TeamID  IN (
                                                 SELECT DISTINCT TeamID
                                                 FROM TeamName
@@ -404,33 +404,33 @@ const getLeaderboardBySeason = async (db, year, pagesize) => {
 const query = `WITH Teams AS (
   SELECT DISTINCT(NAME), TeamID FROM TeamName WHERE YEAR >= 2010 AND YEAR <= 2016 ORDER BY TeamID
 ),
-   HomeGameWins AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS wins
+   HomeGameWins AS (SELECT DISTINCT(Teams.TeamID) as TeamId, Teams.Name, COUNT(*) AS wins
             FROM Teams
                      JOIN Game
                           ON Game.HomeTeam = Teams.TeamID
             WHERE Game.HomeScore > Game.AwayScore
               AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
             GROUP BY Teams.Name),
-   AwayGameWins AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS wins
+   AwayGameWins AS (SELECT DISTINCT(Teams.TeamID) as TeamId, Teams.Name, COUNT(*) AS wins
             FROM Teams
                      JOIN Game
                           ON Game.AwayTeam = Teams.TeamID
             WHERE Game.HomeScore < Game.AwayScore
               AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
-            GROUP BY Teams.Name), 
+            GROUP BY Teams.Name), /*here it is*/
    embryoLeaderboardWins AS (
-       SELECT HomeGameWins.Name AS TeamName, HomeGameWins.wins AS HomeWins, AwayGameWins.wins AS AwayWins, HomeGameWins.wins + AwayGameWins.wins AS TotalWins
+       SELECT HomeGameWins.TeamId,HomeGameWins.Name AS TeamName, HomeGameWins.wins AS HomeWins, AwayGameWins.wins AS AwayWins, HomeGameWins.wins + AwayGameWins.wins AS TotalWins
        FROM HomeGameWins
                 JOIN AwayGameWins ON HomeGameWins.Name = AwayGameWins.Name
    ),
-   HomeGameLoss AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS loss
+   HomeGameLoss AS (SELECT DISTINCT(Teams.TeamID) as TeamId, Teams.Name, COUNT(*) AS loss
             FROM Teams
                      JOIN Game
                           ON Game.HomeTeam = Teams.TeamID
             WHERE Game.HomeScore < Game.AwayScore
               AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
             GROUP BY Teams.Name),
-   AwayGameLoss AS (SELECT DISTINCT(Teams.TeamID), Teams.Name, COUNT(*) AS loss
+   AwayGameLoss AS (SELECT DISTINCT(Teams.TeamID) as TeamId, Teams.Name, COUNT(*) AS loss
             FROM Teams
                      JOIN Game
                           ON Game.AwayTeam = Teams.TeamID
@@ -438,16 +438,18 @@ const query = `WITH Teams AS (
               AND Game.Date BETWEEN '${startDate}' AND '${endDate}'
             GROUP BY Teams.Name),
    embryoLeaderboardLoss AS (
-       SELECT HomeGameLoss.Name AS TeamName, HomeGameLoss.loss AS HomeLoss, AwayGameLoss.loss AS AwayLoss, HomeGameLoss.loss + AwayGameLoss.loss AS TotalLosses
+       SELECT HomeGameLoss.TeamId, HomeGameLoss.Name AS TeamName, HomeGameLoss.loss AS HomeLoss, AwayGameLoss.loss AS AwayLoss, HomeGameLoss.loss + AwayGameLoss.loss AS TotalLosses
        FROM HomeGameLoss
                 JOIN AwayGameLoss ON HomeGameLoss.Name = AwayGameLoss.Name
    )
-SELECT embryoLeaderboardWins.TeamName, HomeWins, AwayWins, TotalWins, HomeLoss, AwayLoss, TotalLosses, TotalWins + TotalLosses AS TotalGames
+SELECT embryoLeaderboardLoss.TeamId,embryoLeaderboardWins.TeamName, HomeWins, AwayWins, TotalWins, HomeLoss, AwayLoss, TotalLosses, TotalWins + TotalLosses AS TotalGames
 FROM embryoLeaderboardWins
        JOIN embryoLeaderboardLoss
             ON embryoLeaderboardWins.TeamName = embryoLeaderboardLoss.TeamName
 ORDER BY TotalWins DESC
 LIMIT ${pageSize};`
+
+
 
     const row = await db.execute(query);
     return row[0];
@@ -455,6 +457,68 @@ LIMIT ${pageSize};`
     console.log(err);
     throw new Error('Error executing the query' + err);
   }}
+
+const searchPlayers = async(db, playerName, birthCountry, bornBefore, bornAfter, debutBefore, debutAfter, 
+                            minHeight, maxHeight, minWeight, maxWeight, battingHand, throwingHand, 
+                            page, pagesize) => {
+
+  try {
+
+    var query = `SELECT * FROM Player WHERE TRUE`;
+
+    if (playerName) {
+      query = `${query} AND GivenName LIKE '%${playerName}%'`
+    }
+    if (birthCountry) {
+      query = `${query} AND BirthCountry LIKE '%${birthCountry}%'`
+    }
+    if (bornBefore) {
+      query = `${query} AND BirthDate <= '${bornBefore}'`
+    }
+    if (bornAfter) {
+      query = `${query} AND BirthDate >= '${bornAfter}'`
+    }
+    if (debutBefore) {
+      query = `${query} AND DebutDate <= '${debutBefore}'`
+    }
+    if (debutAfter) {
+      query = `${query} AND DebutDate >= '${debutAfter}'`
+    }
+    if (minHeight) {
+      query = `${query} AND Height >= ${minHeight}`
+    }
+    if (maxHeight) {
+      query = `${query} AND Height <= ${maxHeight}`
+    }
+    if (minWeight) {
+      query = `${query} AND Weight >= ${minWeight}`
+    }
+    if (maxWeight) {
+      query = `${query} AND Weight <= ${maxWeight}`
+    }
+    if (battingHand) {
+      query = `${query} AND Bats = '${battingHand}'`
+    }
+    if (throwingHand) {
+      query = `${query} AND Throws = '${throwingHand}'`
+    }
+    
+    query = `${query} ORDER BY ID ASC`
+    
+    if (page) {
+      page_size = pagesize ? pagesize : 10
+      const offset = (page - 1) * page_size
+      query = `${query} LIMIT ${offset}, ${page_size}`
+    }
+
+    const rows = await db.execute(query);
+    return rows[0];
+  } 
+  catch (err) {
+    throw new Error('Error executing the query');
+  }
+
+}
 
 const getPlayerPitchingStats = async(db, playerID, dateStart, dateEnd, againstTeams, forTeams) => {
   try {

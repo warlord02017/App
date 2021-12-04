@@ -218,6 +218,22 @@ app.get('/player/batstats/:id', async(req, res) => {
 
 })
 
+// this endpoint is used to fetch players (author: mahesh)
+
+app.get('/players', async(req, res) => {
+    try {
+
+        const result = await lib.searchPlayers(db, req.query.playerName, req.query.birthCountry, req.query.bornBefore, req.query.bornAfter, req.query.debutBefore, req.query.debutAfter, 
+                            req.query.minHeight, req.query.maxHeight, req.query.minWeight, req.query.maxWeight, req.query.battingHand, req.query.throwingHand, 
+                            req.query.page, req.query.pagesize)
+        res.status(200).json({result})
+
+    } catch (err) {
+        res.status(404).json({error: err.message});
+    }
+
+})
+
 
 module.exports = app;
 
