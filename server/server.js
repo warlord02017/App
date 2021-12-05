@@ -201,5 +201,19 @@ app.get('/api/game/:id', async (req, res) => {
     }
 })
 
+app.get('/api/play/:id', async (req, res) => {
+    try {
+        if (req.params.id === undefined) {
+            res.status(404).json({ error: 'Invalid or Missing GameID' });
+            return;
+        }
+
+        const result = await lib.getPlay(db, req.params.id)
+        res.status(200).json({ result })
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+})
+
 module.exports = app;
 

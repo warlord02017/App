@@ -461,6 +461,23 @@ const getGame = async (db, id) => {
   return query_result[0][0];
 }
 
+const getPlay = async (db, id) => {
+  const query = `
+    SELECT E.EventID, E.HomeScore, E.AwayScore,
+      E.Batter AS BatterID,
+      CONCAT_WS( ' ', Bat.FirstName, Bat.LastName ) AS Batter,
+      E.Pitcher AS PitcherID,
+      CONCAT_WS( ' ', Pit.FirstName, Pit.LastName ) AS Pitcher,
+      E.Strikes, E.Ball, E.Outs, E.Inning, E.EventType, C.Comment
+    FROM Event E
+      JOIN Player Bat on Bat.ID = E.Batter
+      JOIN Player Pit on Pit.ID = E.Pitcher
+      LEFT JOIN EventComment C on C.GameID = E.GameID AND C.EventID = E.EventID
+    WHERE E.GameID = ?
+    ORDER BY E.EventID`;
+  const query_result = await db.execute(query, [id]);
+  return query_result[0];
+}
 
 module.exports = {
   connect,
@@ -473,4 +490,5 @@ module.exports = {
   getTeamByIdAndYear,
   getLeaderboardBySeason,
   getGame,
+  getPlay,
 };
