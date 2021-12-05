@@ -1,5 +1,7 @@
 import config from './config.json'
 
+const base_url = `http://${config.server_host}:${config.server_port}`
+
 const getAllMatches = async (page, pagesize, league) => {
     var res = await fetch(`http://${config.server_host}:${config.server_port}/matches/${league}?page=${page}&pagesize=${pagesize}`, {
         method: 'GET',
@@ -42,9 +44,35 @@ const getPlayerSearch = async (name, nationality, club, rating_high, rating_low,
     return res.json()
 }
 
+/**
+ * Get the summary details of a game.
+ * @param {int} gameId
+ * @returns {
+ *  result: {
+ *      ID,Park,City,HomeTeam,AwayTeam,Date,Attendance,Duration,Innings,Outs,HomeScore,AwayScore,HomeHits,AwayHits,HomeErr,AwayErr,HomeLob,AwayLob
+ * }}
+ */
+const getGame = async (gameId) => {
+    var res = await fetch(`${base_url}/api/game/${gameId}`, {
+        method: 'GET',
+    })
+    return res.json
+}
 
-
-
+/**
+ * Get play by play details of a game.
+ * @param {int} gameId
+ * @returns {
+ *  result: {[
+ *      {EventID,HomeScore,AwayScore,BatterID,Batter,PitcherID,Pitcher,Strikes,Ball,Outs,Inning,EventType,Comment}
+ *  ]}}
+ */
+const getPlay = async (gameId) => {
+    var res = await fetch(`${base_url}/api/play/${gameId}`, {
+        method: 'GET',
+    })
+    return res.json
+}
 
 
 
@@ -60,5 +88,7 @@ export {
     getMatch,
     getPlayer,
     getMatchSearch,
+    getGame,
+    getPlay,
     getPlayerSearch
 }
