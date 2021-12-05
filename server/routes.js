@@ -1001,7 +1001,7 @@ const getPlayerBattingStats = async(db, playerID, dateStart, dateEnd, againstTea
     if (row[0][0].totalNumEvents > 0) {
       res.BattingAvg = (res.Homeruns + res.Walks + res.Singles + res.Doubles + res.Triples) / row[0][0].totalNumEvents 
     } else {
-      res.BattingAvg = null
+      res.BattingAvg = 0;
     }
 
     return res;

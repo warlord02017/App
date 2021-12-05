@@ -72,6 +72,18 @@ async function getTeamByIdAndYear(teamId, year) {
     return response.data;
 }
 
+async function getBatterStats(id) {
+    const url = `http://${config.server_host}:${config.server_port}/player/batstats/${id}`;
+    const response = await axios.get(url);
+    return response.data;
+}
+
+async function getPitcherStats(id) {
+    const url = `http://${config.server_host}:${config.server_port}/player/pitchstats/${id}`;
+    const response = await axios.get(url);
+    return response.data;
+}
+
 export {
     getPitchers,
     getBatters,
@@ -83,4 +95,6 @@ export {
     getGames,
     getPitchingLeadersTeam,
     getBattingLeadersTeam,
+    getBatterStats,
+    getPitcherStats,
  }

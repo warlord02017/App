@@ -23,3 +23,11 @@
 .h2h-go:hover {
     color:#E25;
 }
+
+#label {
+    text-align: left;
+    letter-spacing: 0.1rem;
+    font-style: italic;
+    font-weight: bolder;
+    font-size: 25px;
+}

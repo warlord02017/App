@@ -65,7 +65,7 @@ class Teams extends React.Component {
       <div>
         <NavBar />
         <div className="selection">
-        <h3>Teams Leaderboard</h3>
+        <h3 style={{fontSize: '30px'}}>Teams Leaderboard</h3>
           <Select defaultValue="2011" style={{ marginLeft: '2%', width: 120 }} onChange={this.yearOnChange}>
              <Option value="2011">2011</Option>
              <Option value="2012">2012</Option>

@@ -1,6 +1,7 @@
 import {Navbar, Container, Nav, NavDropdown} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 function NavBar() {
+  
     return (
         <div>
             <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
