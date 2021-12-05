@@ -445,6 +445,32 @@ LIMIT ${pageSize};`
     throw new Error('Error executing the query' + err);
   }}
 
+const getGame = async (db, id) => {
+  const query = `
+    SELECT G.ID AS ID,
+      P.Name AS Park, P.City AS City,
+      HT.Name AS HomeTeam, AT.Name AS AwayTeam,
+      G.Date, G.Attendance, G.Duration, G.Innings, G.Outs,
+      G.HomeScore, G.AwayScore, G.HomeHits, G.AwayHits, G.HomeErr, G.AwayErr, G.HomeLob, G.AwayLob
+    FROM Game G
+      JOIN LatestTeamName HT ON HT.TeamID = G.HomeTeam
+      JOIN LatestTeamName AT ON AT.TeamID = G.AwayTeam
+      JOIN Park P on P.ID = G.Park
+    WHERE G.ID = ?`;
+  const query_result = await db.execute(query, [id]);
+  return query_result[0][0];
+}
+
+
 module.exports = {
-  connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams/*, getBattingLeadersTeams*/, getTeamByIdAndYear, getLeaderboardBySeason
+  connect,
+  getPlayer,
+  headToHeadPlayers,
+  teamWins,
+  getGameDates,
+  getSnapShotTeams,
+  getPitchingLeadersTeams/*, getBattingLeadersTeams*/,
+  getTeamByIdAndYear,
+  getLeaderboardBySeason,
+  getGame,
 };
