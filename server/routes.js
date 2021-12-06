@@ -203,13 +203,13 @@ const getSnapShotTeams = async (db, team1, team2, field) => {
                     WHERE Game.AwayTeam IN (SELECT DISTINCT TeamID FROM TeamName WHERE Name = '${team2}')
                     AND Game.HomeTeam IN (SELECT DISTINCT TeamID FROM TeamName WHERE Name = '${team1}')
                 )
-                SELECT Name as team, (homewins.wins + awaywins.wins) AS wins, SUM(score) as total_runs, AVG(score) as avg_score, MAX(score) as max_runs, MIN(score) as min_runs
+                SELECT Name as team, (IFNULL(homewins.wins, 0) + IFNULL(awaywins.wins,0)) AS wins, SUM(score) as total_runs, AVG(score) as avg_score, MAX(score) as max_runs, MIN(score) as min_runs
                 FROM games
                 JOIN teams
                 ON teams.TeamID = games.team
-                JOIN homewins
+                LEFT JOIN homewins
                 ON teams.TeamID = homewins.HomeTeam
-                JOIN awaywins
+                LEFT JOIN awaywins
                 ON teams.TeamID = awaywins.AwayTeam
                 GROUP BY teams.TeamID;`
 

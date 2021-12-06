@@ -17,27 +17,80 @@ function Snap() {
         const t2 = (url.split('/').slice(-2)[0]).split('-').join(' ');
         
         lib.geth2hteams(t1, t2).then((res) => {
-            if (res.result[0].team !== t1) {
+            if (res.result.length !== 2) {
+                return;
+            } else if (res.result[0].team !== t1) {
                 let temp = res.result[0];
                 res.result[0] = res.result[1];
                 res.result[1] = temp;
             }
             setData(res.result);
             lib.geth2hteams(t1, t2, 'home').then((res) => {
-                if (res.result[0].team !== t1) {
+                if (res.result.length !== 2) {
+                    let stats = [];
+                    if (res.result[0].team !== t1) {
+                        stats.push({
+                            "team": t2,
+                            "wins": 0,
+                            "total_runs": "0",
+                            "avg_score": "0",
+                            "max_runs": 0,
+                            "min_runs": 0
+                        });
+                        stats.push(res.result[0]);
+                        setHomeData(stats);
+                    } else {
+                        stats.push(res.result[0]);
+                        stats.push({
+                            "team": t1,
+                            "wins": 0,
+                            "total_runs": "0",
+                            "avg_score": "0",
+                            "max_runs": 0,
+                            "min_runs": 0
+                        });
+                        setHomeData(stats);
+                    }
+                } else if (res.result[0].team !== t1) {
                     let temp = res.result[0];
                     res.result[0] = res.result[1];
                     res.result[1] = temp;
+                    setHomeData(res.result);
                 }
-                setHomeData(res.result);
             })
             lib.geth2hteams(t1, t2, 'away').then((res) => {
-                if (res.result[0].team !== t1) {
+                if (res.result.length !== 2) {
+                    let stats = [];
+                    console.log(stats);
+                    if (res.result[0].team !== t1) {
+                        stats.push({
+                            "team": t1,
+                            "wins": 0,
+                            "total_runs": "0",
+                            "avg_score": "0",
+                            "max_runs": 0,
+                            "min_runs": 0
+                        });
+                        stats.push(res.result[0]);
+                        setAwayData(stats);
+                    } else {
+                        stats.push(res.result[0]);
+                        stats.push({
+                            "team": t2,
+                            "wins": 0,
+                            "total_runs": "0",
+                            "avg_score": "0",
+                            "max_runs": 0,
+                            "min_runs": 0
+                        });
+                        setAwayData(stats);
+                    }
+                } else if (res.result[0].team !== t1) {
                     let temp = res.result[0];
                     res.result[0] = res.result[1];
                     res.result[1] = temp;
+                    setAwayData(res.result);
                 }
-                setAwayData(res.result);
                 setIsLoading(false);
             })
         })
