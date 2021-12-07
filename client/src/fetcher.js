@@ -72,8 +72,8 @@ async function getTeamByIdAndYear(teamId, year) {
     return response.data;
 }
 
-async function getBatterStats(id) {
-    const url = `http://${config.server_host}:${config.server_port}/player/batstats/${id}`;
+async function getBatterStats(id, dateStart, dateEnd) {
+    const url = `http://${config.server_host}:${config.server_port}/player/batstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd},`;
     const response = await axios.get(url);
     return response.data;
 }

@@ -42,7 +42,7 @@ function Head2HeadPlayers() {
             versus.Average = (versus.Single + versus.Homerun + versus.Triple + versus.Double + versus.Walk) / (
                 versus.Single + versus.Homerun + versus.Triple + versus.Double + versus.Walk + versus.Strikeout + versus['Generic out']);
             setStats(versus);
-            lib.getBatterStats(batter).then((res) => {
+            lib.getBatterStats(batter, "2011-01-01", "2016-01-01").then((res) => {
                 setBatterStats(res.result);
                 lib.getPitcherStats(pitcher).then((res) => {
                     setPitcherStats(res.result);
