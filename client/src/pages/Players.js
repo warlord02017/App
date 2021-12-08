@@ -12,10 +12,9 @@ function Players() {
     const [batters, setBatters] = useState([]);
     const [teams, setTeams] = useState([]);
     const [battingData, setBattingData] = useState([]);
-    const [againstTeam, setAgainstTeam] = useState('All');
+    const [againstTeam, setAgainstTeam] = useState(-1);
     const [stat, setStat] = useState('Homeruns');
     const [isLoading, setIsLoading] = useState(false);
-    const [allData, setAllData] = useState([]);
 
     const [selectedBatters, setSelectedBatters] = useState([]);
 
@@ -23,7 +22,7 @@ function Players() {
         const batters = await lib.getBatters();
         const res_bat= batters.result.map((p) => ({key: p.ID, value: p.ID, text: p.FirstName + " " + p.LastName}));
         const t = await lib.getTeams();
-        const res_teams = t.data.map((t, idx) => ({key: idx, value: t, text: t}));
+        const res_teams = t.data.map((t) => ({key: t[0], value: t[0], text: t[1]}));
         setTeams(res_teams);
         setBatters(res_bat);
         setIsLoading(false);
@@ -38,7 +37,7 @@ function Players() {
             data[id[0]] = [];
             player[id[0]] = id[1];
             for (let date of start_end) {
-                const res = await lib.getBatterStats(id[0], date[0], date[1]);
+                const res = await lib.getBatterStats(id[0], date[0], date[1], againstTeam);
                 data[id[0]].push(res.result);
             }
         }
@@ -57,7 +56,7 @@ function Players() {
         }));
         setBattingData(plotData);
 
-    }, [selectedBatters, stat]);
+    }, [selectedBatters, stat, againstTeam]);
 
     useEffect(() => {
 
@@ -74,6 +73,10 @@ function Players() {
 
     function handleStatChange(event, data) {
         setStat(data.value);
+    }
+
+    function handleTeamChange(event, data) {
+        setAgainstTeam(data.value);
     }
 
     return (
@@ -112,7 +115,8 @@ function Players() {
                     fluid
                     search
                     selection
-                    options={teams}
+                    options={[{key: -1, text:'All' , value: -1}, ...teams]}
+                    onChange={handleTeamChange}
               />
               <Dropdown
                     style={{width: '200px', height: '10px', marginRight: '10px'}}
@@ -126,6 +130,7 @@ function Players() {
             <div>
             <Plot style={{marginLeft: '15%'}}
                 data={battingData}
+                config={{displayModeBar: false}}
                 layout={ {width: 1000, height: 500, title: 'Stats Over 2011-2015', showlegend: true, 
                     xaxis: {
                     title: {

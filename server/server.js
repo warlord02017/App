@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 app.get('/teams', async (req, res) => {
     try {
         const result = await lib.getTeams(db);
-        const data = result.map((d) => d.NAME);
+        const data = result.map((d) => [d.TeamID, d.NAME]);
         res.status(200).json({data});
         return;
     } catch (err) {

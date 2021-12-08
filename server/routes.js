@@ -22,7 +22,7 @@ const connect = async () => {
 
 const getTeams = async(db) => {
   try {
-    const query = 'SELECT DISTINCT(NAME) FROM TeamName WHERE YEAR>=2011';
+    const query = 'SELECT DISTINCT(NAME), TeamID FROM TeamName WHERE YEAR>=2011';
     const row = await db.execute(query);
     return row[0];
   }
