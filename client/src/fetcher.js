@@ -89,11 +89,21 @@ async function getBatterStats(id, dateStart, dateEnd, againstTeam) {
     }
 }
 
-
-async function getPitcherStats(id) {
-    const url = `http://${config.server_host}:${config.server_port}/player/pitchstats/${id}`;
-    const response = await axios.get(url);
-    return response.data;
+async function getPitcherStats(id, dateStart, dateEnd, againstTeam) {
+    if (againstTeam === -1) {
+        const url = `http://${config.server_host}:${config.server_port}/player/pitchstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}`;
+        const response = await axios.get(url);
+        return response.data;
+    } else if (againstTeam === undefined) {
+        const url = `http://${config.server_host}:${config.server_port}/player/pitchstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}`;
+        const response = await axios.get(url);
+        return response.data;
+    }
+    else {
+        const url = `http://${config.server_host}:${config.server_port}/player/pitchstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}&againstTeams=(${againstTeam})`;
+        const response = await axios.get(url);
+        return response.data;
+    }
 }
 
 export {

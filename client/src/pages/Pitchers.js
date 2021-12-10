@@ -7,24 +7,24 @@ import Plot from 'react-plotly.js';
 
 const lib = require('../fetcher.js');
 
-function Players() {
+function Pitchers() {
     const dates = ["2011-09-25", "2012-09-25", "2013-09-25", "2014-09-25", "2015-09-25"];
-    const [batters, setBatters] = useState([]);
+    const [pitchers, setPitchers] = useState([]);
     const [teams, setTeams] = useState([]);
-    const [battingData, setBattingData] = useState([]);
+    const [pitchingData, setPitchingData] = useState([]);
     const [againstTeam, setAgainstTeam] = useState(-1);
-    const [stat, setStat] = useState('Homeruns');
+    const [stat, setStat] = useState('Strikeouts');
     const [isLoading, setIsLoading] = useState(false);
 
-    const [selectedBatters, setSelectedBatters] = useState([]);
+    const [selectedPitchers, setSelectedPitchers] = useState([]);
 
     useEffect(async () => {
-        const batters = await lib.getBatters();
+        const batters = await lib.getPitchers();
         const res_bat= batters.result.map((p) => ({key: p.ID, value: p.ID, text: p.FirstName + " " + p.LastName}));
         const t = await lib.getTeams();
         const res_teams = t.data.map((t) => ({key: t[0], value: t[0], text: t[1]}));
         setTeams(res_teams);
-        setBatters(res_bat);
+        setPitchers(res_bat);
         setIsLoading(false);
     }, []);
 
@@ -33,11 +33,11 @@ function Players() {
         let player = {};
         const start_end = [["2011-01-01", "2012-01-01"], ["2012-01-01", "2013-01-01"], 
                         ["2013-01-01", "2014-01-01"], ["2014-01-01", "2015-01-01"], ["2015-01-01", "2016-01-01"]]
-        for (let id of selectedBatters) {
+        for (let id of selectedPitchers) {
             data[id[0]] = [];
             player[id[0]] = id[1];
             for (let date of start_end) {
-                const res = await lib.getBatterStats(id[0], date[0], date[1], againstTeam);
+                const res = await lib.getPitcherStats(id[0], date[0], date[1], againstTeam);
                 data[id[0]].push(res.result);
             }
         }
@@ -54,21 +54,21 @@ function Players() {
             mode: "lines+markers",
             name: d.name,
         }));
-        setBattingData(plotData);
+        setPitchingData(plotData);
 
-    }, [selectedBatters, stat, againstTeam]);
+    }, [selectedPitchers, stat, againstTeam]);
 
     useEffect(() => {
 
-    }, [battingData]);
+    }, [pitchingData]);
 
-    function handleBatterChange(event, data) {
+    function handlePitcherChange(event, data) {
         let temp = [];
         for (let i = 0; i < data.value.length; i++) {
-            const name = batters.find(o => o.value === data.value[i]).text;
+            const name = pitchers.find(o => o.value === data.value[i]).text;
             temp.push([data.value[i], name]);
         }
-        setSelectedBatters(temp);
+        setSelectedPitchers(temp);
     }
 
     function handleStatChange(event, data) {
@@ -87,13 +87,13 @@ function Players() {
             <div className="selection">
             <Dropdown
                 style={{width: '500px', height: '10px', marginRight: '10px'}}
-                placeholder='Add a batter'
+                placeholder='Add a Pitcher'
                 fluid
                 multiple
                 search
                 selection
-                options={batters}
-                onChange={handleBatterChange}
+                options={pitchers}
+                onChange={handlePitcherChange}
             />
             <Dropdown
                     style={{width: '200px', height: '10px', marginRight: '10px'}}
@@ -102,12 +102,10 @@ function Players() {
                     search
                     selection
                     onChange={handleStatChange}
-                    options={[{key: 1, value: 'Homeruns', text: 'Homeruns'},
-                              {key: 2, value: 'Singles', text: 'Singles'},
-                              {key: 3, value: 'Doubles', text: 'Doubles'},
-                              {key: 4, value: 'Triples', text: 'Triples'}, 
-                              {key: 5, value: 'Walks', text: 'Walks'},
-                              {key: 6, value: 'BattingAvg', text: 'Batting Avg.'}]}
+                    options={[{key: 1, value: 'Strikeouts', text: 'Strikeouts'},
+                              {key: 2, value: 'StrikeoutRate', text: 'Strikeout Rate'},
+                              {key: 3, value: 'HomerunsAllowed', text: 'Homeruns Allowed'},
+                            ]}
               />
               <Dropdown
                     style={{width: '200px', height: '10px', marginRight: '10px'}}
@@ -129,7 +127,7 @@ function Players() {
             </div>
             <div>
             <Plot style={{marginLeft: '15%'}}
-                data={battingData}
+                data={pitchingData}
                 config={{displayModeBar: false}}
                 layout={ {width: 1000, height: 500, title: 'Stats Over 2011-2015', showlegend: true, 
                     xaxis: {
@@ -148,4 +146,4 @@ function Players() {
     );
 }
 
-export default Players;
+export default Pitchers;

@@ -14,8 +14,9 @@ function NavBar() {
         <NavDropdown.Item href="/Head2Head/Teams">Teams</NavDropdown.Item>
         <NavDropdown.Item href="/Head2Head/Players">Players</NavDropdown.Item>
     </NavDropdown>
-      <Nav.Link href="/Players">Players</Nav.Link>
-      <Nav.Link href="/Teams">Leaderboard</Nav.Link>
+      <Nav.Link href="/Batters">Batting Stats</Nav.Link>
+      <Nav.Link href="/Pitchers">Pitching Stats</Nav.Link>
+      <Nav.Link href="/Teams">Teams Leaderboard</Nav.Link>
       <Nav.Link href="/Matches">Matches</Nav.Link>
     </Nav>
   </Navbar.Collapse>
