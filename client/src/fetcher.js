@@ -106,6 +106,12 @@ async function getPitcherStats(id, dateStart, dateEnd, againstTeam) {
     }
 }
 
+async function searchPlayers(bats, throws, country, debutBefore, debutAfter) {
+    const url = `http://${config.server_host}:${config.server_port}/players?birthCountry=${country}&battingHand=${bats}&throwingHand=${throws}&debutBefore=${debutBefore}&debutAfter=${debutAfter}`;
+    const response = await axios.get(url);
+    return response.data;
+}
+
 export {
     getPitchers,
     getBatters,
@@ -119,4 +125,5 @@ export {
     getBattingLeadersTeam,
     getBatterStats,
     getPitcherStats,
+    searchPlayers
  }

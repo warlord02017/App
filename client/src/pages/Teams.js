@@ -109,10 +109,6 @@ class Teams extends React.Component {
           </Table>
         </div>
 
-
-
-
-
       </div>
     )
   }

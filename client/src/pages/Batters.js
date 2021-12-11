@@ -87,7 +87,7 @@ function Batters() {
             <div className="selection">
             <Dropdown
                 style={{width: '500px', height: '10px', marginRight: '10px'}}
-                placeholder='Add a batter'
+                placeholder='Add a Batter'
                 fluid
                 multiple
                 search

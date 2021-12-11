@@ -11,11 +11,12 @@ function NavBar() {
   <Navbar.Collapse id="responsive-navbar-nav">
     <Nav className="me-auto">
     <NavDropdown title="Head2Head" id="basic-nav-dropdown">
-        <NavDropdown.Item href="/Head2Head/Teams">Teams</NavDropdown.Item>
-        <NavDropdown.Item href="/Head2Head/Players">Players</NavDropdown.Item>
+        <NavDropdown.Item href="/Head2Head/Teams">Team Vs. Team</NavDropdown.Item>
+        <NavDropdown.Item href="/Head2Head/Players">Pitcher Vs. Batter</NavDropdown.Item>
+        <NavDropdown.Item href="/Batters">Batter Vs. Batter</NavDropdown.Item>
+        <NavDropdown.Item href="/Pitchers">Pitcher Vs. Pitcher</NavDropdown.Item>
     </NavDropdown>
-      <Nav.Link href="/Batters">Batting Stats</Nav.Link>
-      <Nav.Link href="/Pitchers">Pitching Stats</Nav.Link>
+      <Nav.Link href="/Players">Players Leaderboard</Nav.Link>
       <Nav.Link href="/Teams">Teams Leaderboard</Nav.Link>
       <Nav.Link href="/Matches">Matches</Nav.Link>
     </Nav>

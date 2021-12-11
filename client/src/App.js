@@ -11,6 +11,7 @@ import Main from './pages/Main';
 import Teams from './pages/Teams';
 import Batters from './pages/Batters';
 import Pitchers from './pages/Pitchers';
+import Players from './pages/Players';
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
       <Route path="/" element={<Main />}></Route>
         <Route path="/Head2Head/Teams" element={<Head2HeadTeams />}></Route>   
         <Route path="/Head2Head/Players" element={<Head2HeadPlayers />}></Route>
+        <Route path="/Players" element={<Players />}></Route>
         <Route path="/Teams" element={<Teams />}></Route>
         <Route path="/Batters" element={<Batters />}></Route>
         <Route path="/Pitchers" element={<Pitchers />}></Route>

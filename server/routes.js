@@ -422,8 +422,6 @@ const getLeaderboardBySeason = async (db, year, pagesize) => {
     const YearPlusOne = Year + 1;
     var YearPlusOneString = YearPlusOne.toString();
     const endDate = YearPlusOneString.concat("-02-20");
-    console.log(Year);
-    console.log(YearPlusOne);
 
 const query = `WITH Teams AS (
   SELECT DISTINCT(NAME), TeamID FROM TeamName WHERE YEAR >= 2010 AND YEAR <= 2016 ORDER BY TeamID
@@ -703,7 +701,7 @@ const getPlayerPitchingStats = async(db, playerID, dateStart, dateEnd, againstTe
     if (row[0][0].totalNumEvents > 0) {
       res.StrikeoutRate = res.Strikeouts / row[0][0].totalNumEvents 
     } else {
-      res.StrikeoutRate = null
+      res.StrikeoutRate = 0;
     }
 
     return res;
@@ -1015,5 +1013,5 @@ const getPlayerBattingStats = async(db, playerID, dateStart, dateEnd, againstTea
 
 module.exports = {
   connect, getPlayer, headToHeadPlayers, teamWins, getGameDates, getSnapShotTeams, getPitchingLeadersTeams, getBattingLeadersTeams, getTeamByIdAndYear, getLeaderboardBySeason, getPlayerPitchingStats, getPlayerBattingStats,
-  getTeams, getAllBatters, getAllPitchers,
+  getTeams, getAllBatters, getAllPitchers, searchPlayers,
 };
