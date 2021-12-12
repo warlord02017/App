@@ -207,7 +207,7 @@ app.get('/player/pitchstats/:id', async(req, res) => {
         }
 
         const result = await lib.getPlayerPitchingStats(db, req.params.id, req.query.dateStart, req.query.dateEnd,
-            req.query.againstTeams, req.query.forTeams)
+            req.query.againstTeams, req.query.batterHand)
         res.status(200).json({result})
 
     } catch (err) {
@@ -227,7 +227,7 @@ app.get('/player/batstats/:id', async(req, res) => {
         }
 
         const result = await lib.getPlayerBattingStats(db, req.params.id, req.query.dateStart, req.query.dateEnd,
-            req.query.againstTeams, req.query.forTeams)
+            req.query.againstTeams, req.query.pitcherHand)
         res.status(200).json({result})
 
     } catch (err) {
