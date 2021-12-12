@@ -731,7 +731,7 @@ const getBattingLeadersTeams = async (db, team1, team2) => {
                   ON Event.GameID = Game.ID
                   JOIN TeamMember
                   ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Batter
-                  WHERE Game.Date >= 2011
+                  WHERE Game.Date >= "2011-01-01"
                   AND TeamMember.TeamID  IN (
                                               SELECT DISTINCT TeamID
                                               FROM TeamName
@@ -758,7 +758,7 @@ const getBattingLeadersTeams = async (db, team1, team2) => {
                   ON Event.GameID = Game.ID
                   JOIN TeamMember
                   ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Batter
-                  WHERE Game.Date >= 2011
+                  WHERE Game.Date >= "2011-01-01"
                   AND TeamMember.TeamID  IN (
                                               SELECT DISTINCT TeamID
                                               FROM TeamName
