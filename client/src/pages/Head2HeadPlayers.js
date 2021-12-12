@@ -44,7 +44,7 @@ function Head2HeadPlayers() {
             setStats(versus);
             lib.getBatterStats(batter, "2011-01-01", "2016-01-01").then((res) => {
                 setBatterStats(res.result);
-                lib.getPitcherStats(pitcher).then((res) => {
+                lib.getPitcherStats(pitcher, "2011-01-01", "2016-01-01").then((res) => {
                     setPitcherStats(res.result);
                     setIsClick(true);
                 })

@@ -152,29 +152,6 @@ function StatisticLeaders() {
                         </tbody>
                     </Table>
                 </div> 
-                <div className="eye-leaders">
-                    <h5>Most bats</h5>
-                    <Table striped bordered hover variant="light">
-                        <thead>
-                            <tr>
-                            <th>Rank</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
-                            <th>At-Bats</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {batByPitch.map((e, idx) => (
-                                <tr>
-                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{idx + 1}</td>
-                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.firstname}</td>
-                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.lastname}</td>
-                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.at_bats}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
-                </div>               
             </div>
             <h2>Top Pitching Performers</h2>
             <select id="t1" style={{width:'7%'}}class="form-select" aria-label="Default select example" value={topPitchers} onChange={handleChange}>
@@ -229,30 +206,7 @@ function StatisticLeaders() {
                             ))}
                         </tbody>
                     </Table>
-                </div> 
-                <div className="eye-leaders">
-                    <h5>Batters Faced</h5>
-                    <Table striped bordered hover variant="light">
-                        <thead>
-                            <tr>
-                            <th>Rank</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
-                            <th>Batters</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {pitchByBat.map((e, idx) => (
-                                <tr>
-                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{idx + 1}</td>
-                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.firstname}</td>
-                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.lastname}</td>
-                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.batters_faced}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
-                </div>               
+                </div>              
             </div>
         </div>
     )

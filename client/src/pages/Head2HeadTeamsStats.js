@@ -58,14 +58,14 @@ function Head2HeadTeams() {
                 <select id="t1" style={{width:'35%'}}class="form-select" aria-label="Default select example" value={team1} onChange={handleChangeT1}>
                     <option selected>Select a Team</option>
                     {teams.map((t)=> (
-                        <option value={t}>{t}</option>
+                        <option value={t[1]}>{t[1]}</option>
                     ))}
                 </select>
                 <div className="versus">Versus</div>
                 <select id="t2" style={{width:'35%'}}class="form-select" aria-label="Default select example" value={team2} onChange={handleChangeT2}>
                     <option selected>Select a Team</option>
                     {teams.map((t) => (
-                        <option value={t}>{t}</option>
+                        <option value={t[1]}>{t[1]}</option>
                     ))}
                 </select>
                 <button onClick={search} class="h2h-go">Search<span class="fa fa-caret-right"></span></button>

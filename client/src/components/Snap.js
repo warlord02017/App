@@ -56,12 +56,13 @@ function Snap() {
                     res.result[0] = res.result[1];
                     res.result[1] = temp;
                     setHomeData(res.result);
+                } else {
+                    setHomeData(res.result);
                 }
             })
             lib.geth2hteams(t1, t2, 'away').then((res) => {
                 if (res.result.length !== 2) {
                     let stats = [];
-                    console.log(stats);
                     if (res.result[0].team !== t1) {
                         stats.push({
                             "team": t1,
@@ -90,6 +91,8 @@ function Snap() {
                     res.result[0] = res.result[1];
                     res.result[1] = temp;
                     setAwayData(res.result);
+                } else {
+                    setAwayData(res.result);
                 }
                 setIsLoading(false);
             })
@@ -107,6 +110,7 @@ function Snap() {
                 <div className="snap-shot-metrics">
                     <div className="team1">
                         <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                            {console.log(awayData)}
                             <div style={{ width: `${100*data[0].wins/(data[0].wins + data[1].wins)}%`}} className="team1-wins">
                             </div>
                             <div className="num">{data[0].wins}</div>
