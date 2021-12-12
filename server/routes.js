@@ -550,7 +550,7 @@ const searchPlayers = async(db, playerName, birthCountry, bornBefore, bornAfter,
 
 }
 
-const getPlayerPitchingStats = async(db, playerID, dateStart, dateEnd, againstTeams, forTeams) => {
+const getPlayerPitchingStats = async(db, playerID, dateStart, dateEnd, againstTeams, batterHand) => {
   try {
     
     const id = playerID;
@@ -558,12 +558,12 @@ const getPlayerPitchingStats = async(db, playerID, dateStart, dateEnd, againstTe
     const date_end = dateEnd ? dateEnd : "2015-12-31";
     const against_teams = againstTeams ? againstTeams : null;
     
-    const for_teams = forTeams ? forTeams : null;
+    const batterHand = batterHand ? batterHand : null;
 
     var row; 
     var rows;
     
-    if (for_teams === null && against_teams === null) {
+    if (batterHand === null && against_teams === null) {
 
       const query1 = `
         SELECT COUNT(*) as totalNumEvents
@@ -586,30 +586,28 @@ const getPlayerPitchingStats = async(db, playerID, dateStart, dateEnd, againstTe
 
     }
 
-    if (for_teams !== null && against_teams === null) {
+    if (batterHand !== null && against_teams === null) {
 
       const query1 = `
         SELECT COUNT(*) AS totalNumEvents
-        FROM Event JOIN TeamMember JOIN Game
-        ON (Event.Pitcher = TeamMember.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMember.Year)
+        FROM Event JOIN Game JOIN Player
+        ON (Event.GameID = Game.ID AND Event.Batter = Player.ID)
         WHERE 
           Event.Pitcher = '${id}' AND 
           Game.Date >= '${date_start}' AND 
           Game.Date <= '${date_end}' AND 
-          TeamMember.TeamID IN ${for_teams};`
+          Player.Bats = '${batterHand}';`
 
       row = await db.execute(query1);
 
       const query2 = `
         SELECT EventType, COUNT(*) AS eventCount
-        FROM Event
-                 JOIN TeamMember
-                 JOIN Game
-                      ON (Event.Pitcher = TeamMember.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMember.Year)
+        FROM Event JOIN Game JOIN Player
+        ON (Event.GameID = Game.ID AND Event.Batter = Player.ID)
         WHERE Event.Pitcher = '${id}' AND 
           Game.Date >= '${date_start}' AND 
           Game.Date <= '${date_end}' AND 
-          TeamMember.TeamID IN ${for_teams}
+          Player.Bats = '${batterHand}'
           AND Event.EventType IN ("Home run", "Walk", "Single", "Double", "Triple", "Strikeout")
         GROUP BY Event.EventType
         ORDER BY CONCAT(Event.EventType);`
@@ -618,7 +616,7 @@ const getPlayerPitchingStats = async(db, playerID, dateStart, dateEnd, againstTe
 
     }
 
-    if (for_teams === null && against_teams !== null) {
+    if (batterHand === null && against_teams !== null) {
 
       const query1 = `
         SELECT COUNT(*) AS totalNumEvents
@@ -650,32 +648,30 @@ const getPlayerPitchingStats = async(db, playerID, dateStart, dateEnd, againstTe
 
     }
 
-    if (for_teams !== null && against_teams !== null) {
+    if (batterHand !== null && against_teams !== null) {
 
       const query1 = `
         SELECT COUNT(*) AS totalNumEvents
-        FROM Event JOIN TeamMember TeamMemberBatter JOIN TeamMember TeamMemberPitcher JOIN Game
-        ON (Event.Batter = TeamMemberBatter.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMemberBatter.Year
-        AND Event.Pitcher = TeamMemberPitcher.PlayerID AND YEAR(Game.Date) = TeamMemberPitcher.Year)
+        FROM Event JOIN TeamMember JOIN Game JOIN Player
+        ON (Event.Batter = TeamMember.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMember.Year AND Event.Batter = Player.ID)
         WHERE 
           Event.Pitcher = '${id}' AND 
           Game.Date >= '${date_start}' AND 
           Game.Date <= '${date_end}' AND 
-          TeamMemberBatter.TeamID IN ${against_teams} AND
-          TeamMemberPitcher.TeamID IN ${for_teams};`
+          TeamMember.TeamID IN ${against_teams} AND
+          Player.Bats = '${batterHand}';`
 
       row = await db.execute(query1);
 
       const query2 = `
         SELECT EventType, COUNT(*) AS eventCount
-        FROM Event JOIN TeamMember TeamMemberBatter JOIN TeamMember TeamMemberPitcher JOIN Game
-        ON (Event.Batter = TeamMemberBatter.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMemberBatter.Year
-        AND Event.Pitcher = TeamMemberPitcher.PlayerID AND YEAR(Game.Date) = TeamMemberPitcher.Year)
+        FROM Event JOIN TeamMember JOIN Game JOIN Player
+        ON (Event.Batter = TeamMember.PlayerID AND Event.GameID = Game.ID AND YEAR(Game.Date) = TeamMember.Year AND Event.Batter = Player.ID)
         WHERE Event.Pitcher = '${id}' AND 
           Game.Date >= '${date_start}' AND 
           Game.Date <= '${date_end}' AND 
-          TeamMemberBatter.TeamID IN ${against_teams} AND
-          TeamMemberPitcher.TeamID IN ${for_teams} AND 
+          TeamMember.TeamID IN ${against_teams} AND
+          Player.Bats = '${batterHand}' AND
           Event.EventType IN ("Home run", "Walk", "Single", "Double", "Triple", "Strikeout")
         GROUP BY Event.EventType
         ORDER BY CONCAT(Event.EventType);`
