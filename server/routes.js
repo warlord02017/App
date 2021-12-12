@@ -371,12 +371,20 @@ const getPitchingLeadersTeams = async (db, team1, team2, batters_faced, avg) => 
                     FROM all_stats
                     WHERE all_stats.event = 'Strikeout'
                     GROUP BY all_stats.pitcher, all_stats.team
+                ),
+                walks AS (
+                  SELECT all_stats.pitcher, all_stats.team, COUNT(*) as walks
+                  FROM all_stats
+                  WHERE all_stats.event = 'Walk'
+                  GROUP BY all_stats.pitcher, all_stats.team
                 )
-                SELECT Player.firstname, Player.lastname, teams.Name as team, strikeouts.strikeouts, total.batters_faced,
+                SELECT Player.firstname, Player.lastname, teams.Name as team, strikeouts.strikeouts, total.batters_faced, walks.walks,
                       (strikeouts.strikeouts / total.batters_faced) AS strikeout_rate
                 FROM total
                 JOIN strikeouts
                 ON total.pitcher = strikeouts.pitcher
+                JOIN walks
+                ON total.pitcher = walks.pitcher
                 JOIN Player
                 ON Player.ID = total.pitcher
                 JOIN teams
@@ -813,10 +821,16 @@ const getBattingLeadersTeams = async (db, team1, team2) => {
                   SELECT all_stats.batter, all_stats.team, COUNT(*) as at_bats
                   FROM all_stats
                   GROUP BY all_stats.batter, all_stats.team
+              ),
+              walks AS (
+                SELECT all_stats.batter, all_stats.team, COUNT(*) as walks
+                FROM all_stats
+                WHERE all_stats.event = 'Walk'
+                GROUP BY all_stats.batter, all_stats.team
               )
               SELECT Player.firstname, Player.lastname, teams.Name as team, appearances.at_bats,
                     IFNULL(homeruns.homeruns, 0) AS homeruns, IFNULL(singles.singles, 0) AS singles,
-                    IFNULL(doubles.doubles, 0) AS doubles, IFNULL(triples.triples, 0) AS triples,
+                    IFNULL(doubles.doubles, 0) AS doubles, IFNULL(triples.triples, 0) AS triples, IFNULL(walks.walks, 0) AS walks,
                     (IFNULL(homeruns.homeruns, 0) + IFNULL(singles.singles, 0) + IFNULL(doubles.doubles, 0)
                         + IFNULL(triples.triples, 0)) / at_bats AS batting_avg
               FROM appearances
@@ -828,6 +842,8 @@ const getBattingLeadersTeams = async (db, team1, team2) => {
               ON appearances.batter = doubles.batter AND appearances.team = doubles.team
               LEFT JOIN triples
               ON appearances.batter = triples.batter AND appearances.team = triples.team
+              LEFT JOIN walks
+              ON appearances.batter = walks.batter AND appearances.team = walks.team
               JOIN Player
               ON Player.ID = appearances.batter
               JOIN teams

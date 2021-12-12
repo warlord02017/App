@@ -17,7 +17,7 @@ function StatisticLeaders() {
     const [batByBA, setBatByBA] = useState();
 
     function sortByPitch(arr) {
-        arr.sort((a, b) => a.at_bats > b.at_bats ? -1 : 1);
+        arr.sort((a, b) => a.walks > b.walks ? -1 : 1);
         return arr;
     }
 
@@ -38,7 +38,7 @@ function StatisticLeaders() {
     const [pitchBySR, setPitchBySR] = useState();
 
     function sortByBattersFaced(arr) {
-        arr.sort((a, b) => a.batters_faced > b.batters_faced ? -1 : 1);
+        arr.sort((a, b) => a.walks > b.walks ? 1 : -1);
         return arr;
     }
 
@@ -152,6 +152,30 @@ function StatisticLeaders() {
                         </tbody>
                     </Table>
                 </div> 
+                <div className="hitting-leaders">
+                    <h5>Best Eye</h5>
+                    <Table striped bordered hover variant="light">
+                        <thead>
+                            <tr>
+                            <th>Rank</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Walks Drawn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {batByPitch.map((e, idx) => (
+                                <tr>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{idx + 1}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.firstname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.lastname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.walks}</td>
+                                </tr>
+                            ))}
+   
+                        </tbody>
+                    </Table>
+                </div> 
             </div>
             <h2>Top Pitching Performers</h2>
             <select id="t1" style={{width:'7%'}}class="form-select" aria-label="Default select example" value={topPitchers} onChange={handleChange}>
@@ -206,7 +230,30 @@ function StatisticLeaders() {
                             ))}
                         </tbody>
                     </Table>
-                </div>              
+                </div>
+                <div className="hitting-leaders">
+                    <h5>Least Walks Allowed</h5>
+                    <Table striped bordered hover variant="light">
+                        <thead>
+                            <tr>
+                            <th>Rank</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Walks Allowed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {pitchByBat.map((e, idx) => (
+                                <tr>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{idx + 1}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.firstname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.lastname}</td>
+                                    <td style={{color: `${e.team === team1 ? 'blue': 'red'}`}}>{e.walks}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                </div>                          
             </div>
         </div>
     )

@@ -18,7 +18,6 @@ function NavBar() {
     </NavDropdown>
       <Nav.Link href="/Players">Players Leaderboard</Nav.Link>
       <Nav.Link href="/Teams">Teams Leaderboard</Nav.Link>
-      <Nav.Link href="/Matches">Matches</Nav.Link>
     </Nav>
   </Navbar.Collapse>
   </Container>
