@@ -91,6 +91,13 @@ class Players extends React.Component {
   }
 
   debutOnChange(e) {
+    if (e === null) {
+      searchPlayers(this.state.bats, this.state.throws, this.state.country, '', '1980-01-01').then((res) => {
+        res.result.map((e) => {e.DebutDate = this.formatDate(new Date(e.DebutDate))});
+        this.setState({ playerResults: res.result });
+        return;
+    })
+    }
     const after = moment(new Date(e[0]._d)).format("YYYY-MM-DD");
     const before = moment(new Date(e[1]._d)).format("YYYY-MM-DD");
     this.state.debutAfter = after;
