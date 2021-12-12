@@ -72,35 +72,35 @@ async function getTeamByIdAndYear(teamId, year) {
     return response.data;
 }
 
-async function getBatterStats(id, dateStart, dateEnd, againstTeam) {
+async function getBatterStats(id, dateStart, dateEnd, againstTeam, pitcherHand) {
     if (againstTeam === -1) {
-        const url = `http://${config.server_host}:${config.server_port}/player/batstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}`;
+        const url = `http://${config.server_host}:${config.server_port}/player/batstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}&pitcherHand=${pitcherHand}`;
         const response = await axios.get(url);
         return response.data;
     } else if (againstTeam === undefined) {
-        const url = `http://${config.server_host}:${config.server_port}/player/batstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}`;
+        const url = `http://${config.server_host}:${config.server_port}/player/batstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}&pitcherHand=${pitcherHand}`;
         const response = await axios.get(url);
         return response.data;
     }
     else {
-        const url = `http://${config.server_host}:${config.server_port}/player/batstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}&againstTeams=(${againstTeam})`;
+        const url = `http://${config.server_host}:${config.server_port}/player/batstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}&pitcherHand=${pitcherHand}&againstTeams=(${againstTeam})`;
         const response = await axios.get(url);
         return response.data;
     }
 }
 
-async function getPitcherStats(id, dateStart, dateEnd, againstTeam) {
+async function getPitcherStats(id, dateStart, dateEnd, againstTeam, batterHand) {
     if (againstTeam === -1) {
-        const url = `http://${config.server_host}:${config.server_port}/player/pitchstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}`;
+        const url = `http://${config.server_host}:${config.server_port}/player/pitchstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}&batterHand=${batterHand}`;
         const response = await axios.get(url);
         return response.data;
     } else if (againstTeam === undefined) {
-        const url = `http://${config.server_host}:${config.server_port}/player/pitchstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}`;
+        const url = `http://${config.server_host}:${config.server_port}/player/pitchstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}&batterHand=${batterHand}`;
         const response = await axios.get(url);
         return response.data;
     }
     else {
-        const url = `http://${config.server_host}:${config.server_port}/player/pitchstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}&againstTeams=(${againstTeam})`;
+        const url = `http://${config.server_host}:${config.server_port}/player/pitchstats/${id}?dateStart=${dateStart}&dateEnd=${dateEnd}&batterHand=${batterHand}&againstTeams=(${againstTeam})`;
         const response = await axios.get(url);
         return response.data;
     }

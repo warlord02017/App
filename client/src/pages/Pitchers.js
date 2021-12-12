@@ -15,6 +15,7 @@ function Pitchers() {
     const [againstTeam, setAgainstTeam] = useState(-1);
     const [stat, setStat] = useState('Strikeouts');
     const [isLoading, setIsLoading] = useState(false);
+    const [batHand, setbatHand] = useState('');
 
     const [selectedPitchers, setSelectedPitchers] = useState([]);
 
@@ -37,7 +38,7 @@ function Pitchers() {
             data[id[0]] = [];
             player[id[0]] = id[1];
             for (let date of start_end) {
-                const res = await lib.getPitcherStats(id[0], date[0], date[1], againstTeam);
+                const res = await lib.getPitcherStats(id[0], date[0], date[1], againstTeam, batHand);
                 data[id[0]].push(res.result);
             }
         }
@@ -56,7 +57,7 @@ function Pitchers() {
         }));
         setPitchingData(plotData);
 
-    }, [selectedPitchers, stat, againstTeam]);
+    }, [selectedPitchers, stat, againstTeam, batHand]);
 
     useEffect(() => {
 
@@ -77,6 +78,10 @@ function Pitchers() {
 
     function handleTeamChange(event, data) {
         setAgainstTeam(data.value);
+    }
+
+    function handleHandChange(event, data) {
+        setbatHand(data.value);
     }
 
     return (
@@ -122,7 +127,8 @@ function Pitchers() {
                     fluid
                     search
                     selection
-                    options={[{key: 1, text: 'Both', value: 'B'}, {key: 2, text: 'Right', value: 'R'}, {key: 3, text: 'Left', value: 'L'}]}
+                    options={[{key: 1, text: 'Both', value: ''}, {key: 2, text: 'Right', value: 'R'}, {key: 3, text: 'Left', value: 'L'}]}
+                    onChange={handleHandChange}
               />
             </div>
             <div>

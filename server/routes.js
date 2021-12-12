@@ -558,7 +558,7 @@ const getPlayerPitchingStats = async(db, playerID, dateStart, dateEnd, againstTe
     const date_end = dateEnd ? dateEnd : "2015-12-31";
     const against_teams = againstTeams ? againstTeams : null;
     
-    const batterHand = batterHand ? batterHand : null;
+    batterHand = batterHand ? batterHand : null;
 
     var row; 
     var rows;
@@ -862,7 +862,7 @@ const getPlayerBattingStats = async(db, playerID, dateStart, dateEnd, againstTea
     const date_end = dateEnd ? dateEnd : "2015-12-31";
     const against_teams = againstTeams ? againstTeams : null;
     
-    const pitcherHand = pitcherHand ? pitcherHand : null;
+    pitcherHand = pitcherHand ? pitcherHand : null;
 
     var row; 
     var rows;
