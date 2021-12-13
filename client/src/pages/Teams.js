@@ -21,6 +21,7 @@ class Teams extends React.Component {
     this.state = {
       leaderboardResults: [],
       playersInTeamResults: [],
+      selectedTeamName: null,
       year: 2014
     }
 
@@ -37,10 +38,10 @@ class Teams extends React.Component {
     return res;
   }
 
-   showTeamMembers(value) {
+   showTeamMembers(name, value) {
     getTeamByIdAndYear(value,this.state.year).then(res => {
       res.result.map((e) => {e.DebutDate = this.formatDate(new Date(e.DebutDate))});
-      this.setState({ playersInTeamResults: res.result })
+      this.setState({ selectedTeamName: name, playersInTeamResults: res.result })
     })
   }
 
@@ -78,7 +79,7 @@ class Teams extends React.Component {
           
           <Table onRow={(record, rowIndex) => {
     return {
-      onClick: event => {this.showTeamMembers(record.TeamId)}, 
+      onClick: event => {this.showTeamMembers(record.TeamName , record.TeamId)},
     };
   }}dataSource={this.state.leaderboardResults} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 5}}>
           {/* <Column title="TeamId" dataIndex="TeamId" key="TeamId"/> */}
@@ -100,8 +101,8 @@ class Teams extends React.Component {
         </div>
 
         <div style={{ width: '70vw', margin: '0 auto', marginTop: '5vh' }}>
-          <h3>Players in the Team</h3>
-          <Table dataSource={this.state.playersInTeamResults} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 5,showQuickJumper:true}}>
+          <h3>Players in {this.state.selectedTeamName? this.state.selectedTeamName : "Team"}</h3>
+          <Table dataSource={this.state.playersInTeamResults} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 12,showQuickJumper:true}}>
           <Column title="FirstName" dataIndex="FirstName" key="FirstName"/>
           <Column title="LastName" dataIndex="LastName" key="LastName"/>
           <Column title="BirthCountry" dataIndex="BirthCountry" key="BirthCountry"/>

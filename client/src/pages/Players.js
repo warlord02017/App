@@ -33,6 +33,7 @@ class Players extends React.Component {
       country: '',
       bats: '',
       throws: '',
+      selectedPlayerName: null,
     }
 
     this.batHandOnChange = this.batHandOnChange.bind(this);
@@ -55,14 +56,14 @@ class Players extends React.Component {
     return current < moment("19800101", "YYYYMMDD");
   }
 
-   showPlayerStats(value) {
+   showPlayerStats(name, value) {
        getBatterStats(value, "2011-01-01", "2016-01-01", undefined, '').then((res) => {
         res.result.BattingAvg = res.result.BattingAvg.toFixed(3);
-        this.setState({ playerStatsResults: [res.result] })
+        this.setState({ selectedPlayerName: name, playerStatsResults: [res.result] })
        });
        getPitcherStats(value, "2011-01-01", "2016-01-01", undefined, '').then((res) => {
         res.result.StrikeoutRate = res.result.StrikeoutRate.toFixed(3);
-           this.setState( {playerPitchResults: [res.result]})
+           this.setState({ selectedPlayerName: name, playerPitchResults: [res.result] })
        })
   }
 
@@ -137,7 +138,7 @@ class Players extends React.Component {
           
           <Table onRow={(record, rowIndex) => {
     return {
-      onClick: event => {this.showPlayerStats(record.ID)}, 
+      onClick: event => {this.showPlayerStats(`${record.FirstName} ${record.LastName}`, record.ID)},
     };
   }}dataSource={this.state.playerResults} pagination={{ pageSizeOptions:[5, 10, 25, 50], defaultPageSize: 5}}>
           {/* <Column title="PlayerId" dataIndex="ID" key="PlayerId" /> */}
@@ -154,8 +155,8 @@ class Players extends React.Component {
         </div>
 
         <div style={{ width: '70vw', margin: '0 auto', marginTop: '5vh' }}>
-          <h3>Batting Stats</h3>
-          <Table dataSource={this.state.playerStatsResults}>
+          <h3>Batting Stats {this.state.selectedPlayerName ? "for " + this.state.selectedPlayerName : ""}</h3>
+          <Table dataSource={this.state.playerStatsResults} pagination={false}>
           <Column title="Homeruns" dataIndex="Homeruns" key="Homeruns"/>
           <Column title="Singles" dataIndex="Singles" key="Homeruns"/>
           <Column title="Doubles" dataIndex="Doubles" key="Homeruns"/>
@@ -163,8 +164,8 @@ class Players extends React.Component {
           <Column title="Walks" dataIndex="Walks" key="Homeruns"/>
           <Column title="Batting Avg." dataIndex="BattingAvg" key="Batting Avg."/>
           </Table>
-          <h3>Pitching Stats</h3>
-          <Table dataSource={this.state.playerPitchResults}>
+          <h3>Pitching Stats {this.state.selectedPlayerName ? "for " + this.state.selectedPlayerName : ""}</h3>
+          <Table dataSource={this.state.playerPitchResults} pagination={false}>
           <Column title="Strikeouts" dataIndex="Strikeouts" key="Strikeouts"/>
           <Column title="Homeruns Allowed" dataIndex="HomerunsAllowed" key="HomerunsAllowed"/>
           <Column title="Walks Allowed" dataIndex="WalksAllowed" key="WalksAllowed"/>
