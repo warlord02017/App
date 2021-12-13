@@ -56,11 +56,11 @@ class Players extends React.Component {
   }
 
    showPlayerStats(value) {
-       getBatterStats(value, "2011-01-01", "2016-01-01").then((res) => {
+       getBatterStats(value, "2011-01-01", "2016-01-01", undefined, '').then((res) => {
         res.result.BattingAvg = res.result.BattingAvg.toFixed(3);
         this.setState({ playerStatsResults: [res.result] })
        });
-       getPitcherStats(value, "2011-01-01", "2016-01-01").then((res) => {
+       getPitcherStats(value, "2011-01-01", "2016-01-01", undefined, '').then((res) => {
         res.result.StrikeoutRate = res.result.StrikeoutRate.toFixed(3);
            this.setState( {playerPitchResults: [res.result]})
        })

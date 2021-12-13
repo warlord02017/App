@@ -42,9 +42,9 @@ function Head2HeadPlayers() {
             versus.Average = (versus.Single + versus.Homerun + versus.Triple + versus.Double + versus.Walk) / (
                 versus.Single + versus.Homerun + versus.Triple + versus.Double + versus.Walk + versus.Strikeout + versus['Generic out']);
             setStats(versus);
-            lib.getBatterStats(batter, "2011-01-01", "2016-01-01").then((res) => {
+            lib.getBatterStats(batter, "2011-01-01", "2016-01-01", undefined, '').then((res) => {
                 setBatterStats(res.result);
-                lib.getPitcherStats(pitcher, "2011-01-01", "2016-01-01").then((res) => {
+                lib.getPitcherStats(pitcher, "2011-01-01", "2016-01-01", undefined, '').then((res) => {
                     setPitcherStats(res.result);
                     setIsClick(true);
                 })
@@ -161,7 +161,7 @@ function Head2HeadPlayers() {
                 </Card.Footer>
               </Card>
             </CardGroup>
-            <h1 id ="label">{batterName} Career Batting Stats</h1>
+            <h1 id ="label">{batterName} 2011-2015 Batting Stats</h1>
             <CardGroup style={{marginTop: '2%'}}>
                 <Card>
                     <Card.Body style={{color: '#E25', fontSize: '35px', textAlign: 'center'}}>
@@ -204,7 +204,7 @@ function Head2HeadPlayers() {
                     </Card.Footer>
                 </Card>
             </CardGroup>
-            <h1 id="label">{pitcherName} Career Pitching Stats</h1>
+            <h1 id="label">{pitcherName} 2011-2015 Pitching Stats</h1>
             <CardGroup style={{marginTop: '2%'}}>
              <Card>
                 <Card.Body style={{color: '#E25', fontSize: '35px', textAlign: 'center'}}>
