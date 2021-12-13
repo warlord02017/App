@@ -81,7 +81,7 @@ class Teams extends React.Component {
       onClick: event => {this.showTeamMembers(record.TeamId)}, 
     };
   }}dataSource={this.state.leaderboardResults} pagination={{ pageSizeOptions:[5, 10], defaultPageSize: 5}}>
-          <Column title="TeamId" dataIndex="TeamId" key="TeamId"/>
+          {/* <Column title="TeamId" dataIndex="TeamId" key="TeamId"/> */}
           <Column title="TeamName" dataIndex="TeamName" key="TeamName"/>
           <ColumnGroup title="Wins">
               <Column title="HomeWins" dataIndex="HomeWins" key="HomeWins" sorter= {(a, b) => a.HomeWins - b.HomeWins}/>

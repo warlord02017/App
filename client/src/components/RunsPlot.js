@@ -32,13 +32,16 @@ function RunsPlot() {
     const url = window.location.href;
     const t1_name = (url.split('/').pop().split('-')).join(' ');
     const t2_name = (url.split('/').slice(-2)[0]).split('-').join(' ');
+    const hover_template = '<b>%{y}</b>';
     lib.getGames(t1_name, t2_name).then((res) => {
       const dates = res.result.map((r) => formatDate(new Date(r.Date)));
       let map = getScores(res.result, t1_name, t2_name);
-      setT1Data({type: 'bar', x: dates, y: map[t1_name], name: t1_name, marker: {
+      setT1Data({type: 'bar', x: dates, y: map[t1_name], name: t1_name, hovertemplate: hover_template,
+      marker: {
         color: 'blue'
       }});
-      setT2Data({type: 'bar', x: dates, y: map[t2_name], name: t2_name, marker: {
+      setT2Data({type: 'bar', x: dates, y: map[t2_name], name: t2_name, hovertemplate: hover_template,
+      marker: {
         color: 'red'
       }});
       setIsLoading(false);

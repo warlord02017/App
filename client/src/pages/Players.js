@@ -140,7 +140,7 @@ class Players extends React.Component {
       onClick: event => {this.showPlayerStats(record.ID)}, 
     };
   }}dataSource={this.state.playerResults} pagination={{ pageSizeOptions:[5, 10, 25, 50], defaultPageSize: 5}}>
-          <Column title="PlayerId" dataIndex="ID" key="PlayerId" />
+          {/* <Column title="PlayerId" dataIndex="ID" key="PlayerId" /> */}
           <Column title="First Name" dataIndex="FirstName" key="FirstName" />
           <Column title="Last Name" dataIndex="LastName" key="LastName" />
           <Column title="Birth Country" dataIndex="BirthCountry" key="BirthCountry" />
