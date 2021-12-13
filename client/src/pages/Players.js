@@ -121,7 +121,7 @@ class Players extends React.Component {
         <NavBar />
         <div className="selection">
         <h3 style={{fontSize: '30px'}}>Players Leaderboard</h3>
-            <RangePicker onChange={this.debutOnChange} style={{ marginLeft: '2%', width: 200 }} disabledDate={this.disabledDate} />
+            <RangePicker placeholder={["Debut After", "Debut Before"]} onChange={this.debutOnChange} style={{ marginLeft: '2%', width: 350 }} disabledDate={this.disabledDate} />
           <Input placeholder="country" style={{ marginLeft: '2%', width: 120 }} onChange={this.countryOnChange} ></Input>
           <Select defaultValue="Bats" style={{ marginLeft: '2%', width: 120 }} onChange={this.batHandOnChange}>
             <Option value="B">Both</Option>
