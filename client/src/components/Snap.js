@@ -110,7 +110,6 @@ function Snap() {
                 <div className="snap-shot-metrics">
                     <div className="team1">
                         <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-                            {console.log(awayData)}
                             <div style={{ width: `${100*data[0].wins/(data[0].wins + data[1].wins)}%`}} className="team1-wins">
                             </div>
                             <div className="num">{data[0].wins}</div>

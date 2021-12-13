@@ -295,102 +295,102 @@ const getPitchingLeadersTeams = async (db, team1, team2, batters_faced, avg) => 
     team1 = team1.split('-').join(' ');
     team2 = team2.split('-').join(' ');
     const query = `WITH teams AS (
-                    SELECT DISTINCT Name, TeamID
-                    FROM TeamName
-                    WHERE Name = '${team2}' or Name = '${team1}'
-                    AND TeamName.Year >= 2011
-                ),
-                games_t1 AS (
-                    SELECT year(Game.Date) as year, Event.Pitcher AS pitcher, TeamMember.TeamID AS team, Event.Batter AS batter, Event.EventType as event
-                    FROM Event
-                    JOIN Game
-                    ON Event.GameID = Game.ID
-                    JOIN TeamMember
-                    ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Pitcher
-                    WHERE Game.Date >= '2011-01-01'
-                    AND TeamMember.TeamID  IN (
-                                                SELECT DISTINCT TeamID
-                                                FROM TeamName
-                                                WHERE Year >= 2011 AND
-                                                Name = '${team1}'
-                                              )
-                ),
-                games_t1_stats AS (
-                    SELECT games_t1.pitcher, games_t1.team, games_t1.event
-                    FROM games_t1
-                    JOIN TeamMember
-                    ON games_t1.year = TeamMember.Year AND TeamMember.PlayerID = games_t1.batter
-                    WHERE TeamMember.TeamID IN (
-                                                SELECT DISTINCT TeamID
-                                                FROM TeamName
-                                                WHERE Year >= 2011 AND
-                                                Name = '${team2}'
-                                                )
-                ),
-                games_t2 AS (
-                    SELECT year(Game.Date) as year, Event.Pitcher AS pitcher, TeamMember.TeamID AS team, Event.Batter AS batter, Event.EventType as event
-                    FROM Event
-                    JOIN Game
-                    ON Event.GameID = Game.ID
-                    JOIN TeamMember
-                    ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Pitcher
-                    WHERE Game.Date >= '2011-01-01'
-                    AND TeamMember.TeamID  IN (
-                                                SELECT DISTINCT TeamID
-                                                FROM TeamName
-                                                WHERE Year >= 2011 AND
-                                                Name = '${team2}'
-                                            )
-                ),
-                games_t2_stats AS (
-                    SELECT games_t2.pitcher, games_t2.team, games_t2.event
-                    FROM games_t2
-                    JOIN TeamMember
-                    ON games_t2.year = TeamMember.Year AND TeamMember.PlayerID = games_t2.batter
-                    WHERE TeamMember.TeamID IN (
-                                                SELECT DISTINCT TeamID
-                                                FROM TeamName
-                                                WHERE Year >= 2011 AND
-                                                Name = '${team1}'
-                                                )
-                ),
-                all_stats AS (
-                    SELECT *
-                    FROM games_t1_stats
-                    UNION ALL
-                    SELECT *
-                    FROM games_t2_stats
-                ),
-                total AS (
-                    SELECT all_stats.pitcher, all_stats.team, COUNT(*) as batters_faced
-                    FROM all_stats
-                    GROUP BY all_stats.pitcher, all_stats.team
-                ),
-                strikeouts AS (
-                    SELECT all_stats.pitcher, all_stats.team, COUNT(*) as strikeouts
-                    FROM all_stats
-                    WHERE all_stats.event = 'Strikeout'
-                    GROUP BY all_stats.pitcher, all_stats.team
-                ),
-                walks AS (
-                  SELECT all_stats.pitcher, all_stats.team, COUNT(*) as walks
-                  FROM all_stats
-                  WHERE all_stats.event = 'Walk'
-                  GROUP BY all_stats.pitcher, all_stats.team
-                )
-                SELECT Player.firstname, Player.lastname, teams.Name as team, strikeouts.strikeouts, total.batters_faced, walks.walks,
-                      (strikeouts.strikeouts / total.batters_faced) AS strikeout_rate
-                FROM total
-                JOIN strikeouts
-                ON total.pitcher = strikeouts.pitcher
-                JOIN walks
-                ON total.pitcher = walks.pitcher
-                JOIN Player
-                ON Player.ID = total.pitcher
-                JOIN teams
-                ON teams.TeamID = total.team
-                WHERE batters_faced > 25
-                ORDER BY strikeout_rate DESC;`
+      SELECT DISTINCT Name, TeamID
+      FROM TeamName
+      WHERE Name = '${team1}' or Name = '${team2}'
+      AND TeamName.Year >= 2011
+  ),
+  games_t1 AS (
+      SELECT year(Game.Date) as year, Event.Pitcher AS pitcher, TeamMember.TeamID AS team, Event.Batter AS batter, Event.EventType as event
+      FROM Event
+      JOIN Game
+      ON Event.GameID = Game.ID
+      JOIN TeamMember
+      ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Pitcher
+      WHERE Game.Date >= '2011-01-01'
+      AND TeamMember.TeamID  IN (
+                                  SELECT DISTINCT TeamID
+                                  FROM TeamName
+                                  WHERE Year >= 2011 AND
+                                  Name = '${team2}'
+                                )
+  ),
+  games_t1_stats AS (
+      SELECT games_t1.pitcher, games_t1.team, games_t1.event
+      FROM games_t1
+      JOIN TeamMember
+      ON games_t1.year = TeamMember.Year AND TeamMember.PlayerID = games_t1.batter
+      WHERE TeamMember.TeamID IN (
+                                  SELECT DISTINCT TeamID
+                                  FROM TeamName
+                                  WHERE Year >= 2011 AND
+                                  Name = '${team1}'
+                                  )
+  ),
+  games_t2 AS (
+      SELECT year(Game.Date) as year, Event.Pitcher AS pitcher, TeamMember.TeamID AS team, Event.Batter AS batter, Event.EventType as event
+      FROM Event
+      JOIN Game
+      ON Event.GameID = Game.ID
+      JOIN TeamMember
+      ON year(Game.Date) = TeamMember.Year AND TeamMember.PlayerID = Event.Pitcher
+      WHERE Game.Date >= '2011-01-01'
+      AND TeamMember.TeamID  IN (
+                                  SELECT DISTINCT TeamID
+                                  FROM TeamName
+                                  WHERE Year >= 2011 AND
+                                  Name = '${team1}'
+                              )
+  ),
+  games_t2_stats AS (
+      SELECT games_t2.pitcher, games_t2.team, games_t2.event
+      FROM games_t2
+      JOIN TeamMember
+      ON games_t2.year = TeamMember.Year AND TeamMember.PlayerID = games_t2.batter
+      WHERE TeamMember.TeamID IN (
+                                  SELECT DISTINCT TeamID
+                                  FROM TeamName
+                                  WHERE Year >= 2011 AND
+                                  Name = '${team2}'
+                                  )
+  ),
+  all_stats AS (
+      SELECT *
+      FROM games_t1_stats
+      UNION ALL
+      SELECT *
+      FROM games_t2_stats
+  ),
+  total AS (
+      SELECT all_stats.pitcher, all_stats.team, COUNT(*) as batters_faced
+      FROM all_stats
+      GROUP BY all_stats.pitcher, all_stats.team
+  ),
+  strikeouts AS (
+      SELECT all_stats.pitcher, all_stats.team, COUNT(*) as strikeouts
+      FROM all_stats
+      WHERE all_stats.event = 'Strikeout'
+      GROUP BY all_stats.pitcher, all_stats.team
+  ),
+  walks AS (
+    SELECT all_stats.pitcher, all_stats.team, COUNT(*) as walks
+    FROM all_stats
+    WHERE all_stats.event = 'Walk'
+    GROUP BY all_stats.pitcher, all_stats.team
+  )
+  SELECT Player.firstname, Player.lastname, teams.Name as team, strikeouts.strikeouts, total.batters_faced, walks.walks,
+        (strikeouts.strikeouts / total.batters_faced) AS strikeout_rate
+  FROM total
+  JOIN strikeouts
+  ON total.pitcher = strikeouts.pitcher AND total.team = strikeouts.team
+  JOIN walks
+  ON total.pitcher = walks.pitcher AND total.team = walks.team
+  JOIN Player
+  ON Player.ID = total.pitcher
+  JOIN teams
+  ON teams.TeamID = total.team
+  WHERE batters_faced > 25
+  ORDER BY strikeout_rate DESC;`
     const row = await db.execute(query);
     return row[0];
   } catch (err) {
