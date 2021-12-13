@@ -94,7 +94,7 @@ function Head2HeadPlayers() {
           <div>
         {isClick &&
         <div>
-            <h1 id="label">{pitcherName} Vs. {batterName}</h1>
+            <h1 style={{margin: '1em'}} id="label">{pitcherName} Vs. {batterName}</h1>
           <CardGroup>
               <Card>
                 <Card.Body style={{color: '#E25', fontSize: '35px', textAlign: 'center'}}>
@@ -161,7 +161,7 @@ function Head2HeadPlayers() {
                 </Card.Footer>
               </Card>
             </CardGroup>
-            <h1 id ="label">{batterName} 2011-2015 Batting Stats</h1>
+            <h1 style={{margin: '1em'}} id ="label">{batterName} 2011-2015 Batting Stats</h1>
             <CardGroup style={{marginTop: '2%'}}>
                 <Card>
                     <Card.Body style={{color: '#E25', fontSize: '35px', textAlign: 'center'}}>
@@ -204,7 +204,7 @@ function Head2HeadPlayers() {
                     </Card.Footer>
                 </Card>
             </CardGroup>
-            <h1 id="label">{pitcherName} 2011-2015 Pitching Stats</h1>
+            <h1 style={{margin: '1em'}} id="label">{pitcherName} 2011-2015 Pitching Stats</h1>
             <CardGroup style={{marginTop: '2%'}}>
              <Card>
                 <Card.Body style={{color: '#E25', fontSize: '35px', textAlign: 'center'}}>
